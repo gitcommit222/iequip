@@ -18,9 +18,8 @@ const Home = () => {
 					<InfoBox />
 					<InfoBox />
 					<InfoBox />
-					<InfoBox />
 				</div>
-				<div className="max-w-[800px]">
+				<div className="">
 					<h1 className="font-semibold text-[17px] mb-1">Lost Items</h1>
 					<div className="flex items-center rounded-lg bg-white h-[500px] p-5">
 						<LineChart />
