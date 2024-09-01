@@ -1,7 +1,9 @@
 import React from "react";
 import HeaderBox from "../../components/shared/Headerbox";
 import InfoBox from "../../components/InfoBox";
-import LineChart from "../../components/LineChart";
+import LineChart from "../../components/BarChart";
+import BarChart from "../../components/BarChart";
+import PieChart from "../../components/PieChart";
 
 const Home = () => {
 	return (
@@ -12,17 +14,29 @@ const Home = () => {
 				type="greeting"
 				subtext="Track your data progress here."
 			/>
-			<div className="flex flex-col gap-4">
+			<div className="space-y-6">
 				<div className="flex gap-4 flex-wrap">
 					<InfoBox />
 					<InfoBox />
 					<InfoBox />
 					<InfoBox />
 				</div>
-				<div className="">
-					<h1 className="font-semibold text-[17px] mb-1">Lost Items</h1>
-					<div className="flex items-center rounded-lg bg-white h-[500px] p-5">
-						<LineChart />
+				<div className="flex flex-wrap items-center justify-center gap-3">
+					<div className="flex-1">
+						<h1 className="font-semibold text-[17px] mb-1">
+							Most Borrowed Items
+						</h1>
+						<div className="rounded-lg bg-white h-[500px] p-3 flex items-center justify-center">
+							<BarChart />
+						</div>
+					</div>
+					<div className="min-w-[40%]">
+						<h1 className="font-semibold text-[17px] mb-1">
+							Most Borrowed Categories
+						</h1>
+						<div className="bg-white w-full h-[500px] rounded-lg flex items-center justify-center">
+							<PieChart />
+						</div>
 					</div>
 				</div>
 			</div>

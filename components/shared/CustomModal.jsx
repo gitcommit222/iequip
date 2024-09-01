@@ -11,7 +11,7 @@ const CustomModal = ({
 	const [openModal, setOpenModal] = useState(false);
 	return (
 		<>
-			<Button size="md" onClick={() => setOpenModal(true)}>
+			<Button color="success" size="md" onClick={() => setOpenModal(true)}>
 				{btnTitle}
 			</Button>
 			<Modal show={openModal} onClose={() => setOpenModal(false)}>
