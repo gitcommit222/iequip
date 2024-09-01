@@ -1,5 +1,5 @@
 "use client";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Barcode from "react-barcode";
 import { toPng } from "html-to-image";
 import Headerbox from "../../../components/shared/Headerbox";
@@ -13,8 +13,25 @@ import CustomPopover from "../../../components/shared/Popover";
 import CustomModal from "../../../components/shared/CustomModal";
 import AddItemForm from "../../../components/AddItemForm";
 
+import useScanDetection from "use-scan-detection";
+
 const Items = () => {
 	const barcodeRef = useRef();
+	const [scannedCode, setScannedCode] = useState(null);
+
+	useScanDetection({
+		onComplete: (code) => {
+			const sanitizedCode = code.replace(/Shift/g, "");
+			setScannedCode(sanitizedCode);
+		},
+		minLength: 3,
+	});
+
+	useEffect(() => {
+		if (scannedCode) {
+			alert(scannedCode);
+		}
+	}, [scannedCode, setScannedCode]);
 
 	const downloadBarcode = () => {
 		if (barcodeRef.current) {
