@@ -16,10 +16,10 @@ const Home = () => {
 			/>
 			<div className="space-y-6">
 				<div className="flex gap-4 flex-wrap">
-					<InfoBox />
-					<InfoBox />
-					<InfoBox />
-					<InfoBox />
+					<InfoBox title="Total Items" data={104} />
+					<InfoBox title="Borrowed Items" data={25} />
+					<InfoBox title="Returned Items" data={13} />
+					<InfoBox title="Lost Items" data={4} />
 				</div>
 				<div className="flex flex-wrap items-center justify-center gap-3">
 					<div className="flex-1">
