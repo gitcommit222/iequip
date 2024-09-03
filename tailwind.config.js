@@ -11,10 +11,15 @@ module.exports = {
 	],
 	theme: {
 		extend: {
+			colors: {
+				primary: "#21C461",
+				gray2: "#6b7280",
+			},
 			backgroundImage: {
-				"gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-				"gradient-conic":
-					"conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+				"bg-image": "url(/images/bgImage.jpg)",
+			},
+			borderImage: {
+				"bg-border": "url(/images/border.png)",
 			},
 		},
 	},

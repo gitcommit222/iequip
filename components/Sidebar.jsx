@@ -11,9 +11,9 @@ const Sidebar = () => {
 	return (
 		<aside className="sidebar">
 			<div className="flex size-full flex-col gap-2">
-				<div className="border-b p-2 flex items-center justify-center">
+				<div className="border-b flex items-center justify-center">
 					<Link href="/">
-						<Image src={logo} alt="logo" width={106} />
+						<Image src={logo} alt="logo" width={150} height={106} />
 					</Link>
 				</div>
 				<nav className="sidebar-nav ">
