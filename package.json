@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.54.1",
+    "@tanstack/react-query-devtools": "^5.55.0",
     "axios": "^1.7.5",
     "chart.js": "^4.4.4",
     "flowbite-react": "^0.10.1",
@@ -19,8 +21,8 @@
     "react-barcode": "^1.5.3",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18",
-    "use-scan-detection": "^0.2.3",
-    "zustand": "^4.5.5"
+    "react-hot-toast": "^2.4.1",
+    "use-scan-detection": "^0.2.3"
   },
   "devDependencies": {
     "@types/node": "22.5.0",

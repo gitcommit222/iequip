@@ -10,13 +10,13 @@ export const navLinks = [
 		icon: "/icons/bell-solid.svg",
 	},
 	{
-		label: "Items",
-		url: "/items",
-		icon: "/icons/screwdriver-wrench-solid.svg",
-	},
-	{
 		label: "Borrow",
 		url: "/borrow",
 		icon: "/icons/handshake-angle-solid.svg",
+	},
+	{
+		label: "Items",
+		url: "/items",
+		icon: "/icons/screwdriver-wrench-solid.svg",
 	},
 ];

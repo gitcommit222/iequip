@@ -43,12 +43,6 @@ const Sidebar = () => {
 								</li>
 							);
 						})}
-						{/* <div className="w-full ">
-						<button className="flex items-center gap-2">
-							<Image src={signout} height={20} width={20} alt="sign-out" />
-							Sign out
-						</button>
-					</div> */}
 					</ul>
 				</nav>
 			</div>

@@ -1,5 +1,7 @@
 import { Inter, Montserrat } from "next/font/google";
 import "./globals.css";
+import Providers from "../hoc/Providers";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,7 +19,10 @@ export default function RootLayout({ children }) {
 	return (
 		<html lang="en">
 			<body className={`${inter.className} ${montserrat.className}`}>
-				{children}
+				<Providers>
+					{children}
+					<Toaster />
+				</Providers>
 			</body>
 		</html>
 	);
