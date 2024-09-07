@@ -6,7 +6,6 @@ import toast from "react-hot-toast";
 
 const ProtectedRoute = ({ children }) => {
 	const { data: user, isLoading, error, isError } = useUser();
-	// const [initialLoading, setInitialLoading] = useState(true);
 	const router = useRouter();
 
 	useEffect(() => {
@@ -14,7 +13,7 @@ const ProtectedRoute = ({ children }) => {
 			router.push("/sign-in");
 		}
 		if (isError) {
-			toast.error(error.message);
+			toast.error("Session expired, please sign-in.");
 		}
 	});
 

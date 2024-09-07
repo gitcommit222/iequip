@@ -12,28 +12,38 @@ export const useLogin = () => {
 
 	return useMutation({
 		mutationFn: loginUser,
-		onError: (error) => {
-			queryClient.setQueryData("Login failed.", error.message);
-		},
+		onSuccess: (data) => queryClient.setQueryData(["user"], data.user),
 	});
 };
 
 const fetchUser = async () => {
-	const response = await api.get("/user");
+	const response = await api.get("/users/me");
 
 	return response.data;
 };
 
 export const useUser = () => {
-	const queryClient = useQueryClient();
 	return useQuery({
 		queryKey: ["user"],
 		queryFn: fetchUser,
 		retry: false,
 		staleTime: Infinity,
 		cacheTime: Infinity,
-		onError: (error) => {
-			queryClient.setQueryData("Fetch user failed", error.message);
+	});
+};
+
+const logoutUser = async () => {
+	const response = await api.post("/users/logout");
+
+	return response.data;
+};
+
+export const useLogout = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: logoutUser,
+		onSuccess: () => {
+			queryClient.removeQueries(["user"]);
 		},
 	});
 };

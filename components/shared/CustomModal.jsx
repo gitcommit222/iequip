@@ -18,7 +18,9 @@ const CustomModal = ({
 				<Modal.Header>{headerTitle}</Modal.Header>
 				<Modal.Body>{mainContent}</Modal.Body>
 				<Modal.Footer>
-					<Button onClick={() => setOpenModal(false)}>{saveText}</Button>
+					<Button type="submit" onClick={() => setOpenModal(false)}>
+						{saveText}
+					</Button>
 					<Button color="gray" onClick={() => setOpenModal(false)}>
 						{cancelText}
 					</Button>

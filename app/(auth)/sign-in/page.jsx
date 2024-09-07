@@ -20,14 +20,20 @@ const SignIn = () => {
 		e.preventDefault();
 		try {
 			await loginMutation.mutateAsync({ email, password });
-			toast.success(loginMutation.data.message);
-			router.push("/");
-			setEmail("");
-			setPassword("");
 		} catch (error) {
 			console.error("Login failed:");
 		}
 	};
+
+	useEffect(() => {
+		if (loginMutation.isSuccess) {
+			toast.success(loginMutation.data.message);
+			router.push("/");
+			setEmail("");
+			setPassword("");
+		}
+	}, [loginMutation.isSuccess]);
+
 	return (
 		<div className="space-y-4 font-Montserrat px-10">
 			<div className="flex flex-col items-center border-b-2 border-b-gray-300">
@@ -50,6 +56,7 @@ const SignIn = () => {
 							required
 							className="focused:ring-green-500"
 							onChange={(e) => setEmail(e.target.value)}
+							value={email}
 						/>
 					</div>
 					<div>
@@ -64,6 +71,7 @@ const SignIn = () => {
 							type="password"
 							className="focus:ring-green-500 focus:border-green-500"
 							onChange={(e) => setPassword(e.target.value)}
+							value={password}
 							required
 						/>
 					</div>

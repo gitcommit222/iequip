@@ -1,13 +1,44 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import { logo, signout } from "../public";
 import Link from "next/link";
 import { navLinks } from "../constants";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useLogout } from "../hooks/useAuth";
+import toast from "react-hot-toast";
 
 const Sidebar = () => {
 	const pathname = usePathname();
+
+	const {
+		mutateAsync: logout,
+		isPending: isLogoutPending,
+		isSuccess: isLogoutSuccess,
+	} = useLogout();
+
+	const router = useRouter();
+
+	useEffect(() => {
+		let toastId;
+
+		if (isLogoutPending) {
+			// Show loading toast and store the ID
+			toastId = toast.loading("Logging out...");
+		}
+
+		if (isLogoutSuccess) {
+			router.push("/sign-in");
+		}
+
+		return () => {
+			// Clean up: Dismiss the toast if the component unmounts or process ends unexpectedly
+			if (toastId) {
+				toast.dismiss(toastId);
+			}
+		};
+	}, [isLogoutSuccess, isLogoutPending]);
+
 	return (
 		<aside className="sidebar">
 			<div className="flex size-full flex-col gap-2">
@@ -44,6 +75,13 @@ const Sidebar = () => {
 							);
 						})}
 					</ul>
+					<button
+						onClick={async () => await logout()}
+						className="text-black flex justify-center items-center gap-3 text-[14px]"
+					>
+						<Image src={signout} alt="out" width={14} height={14} />
+						Logout
+					</button>
 				</nav>
 			</div>
 		</aside>
