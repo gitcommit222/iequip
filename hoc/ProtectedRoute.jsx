@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useUser } from "../hooks/useAuth";
 import toast from "react-hot-toast";
+import Loader from "../components/loader/Loader";
 
 const ProtectedRoute = ({ children }) => {
 	const { data: user, isLoading, error, isError } = useUser();
@@ -19,7 +20,7 @@ const ProtectedRoute = ({ children }) => {
 
 	// Show loader while checking authentication state
 	if (!user && !isLoading) {
-		return <p>Loading...</p>;
+		return <Loader />;
 	}
 
 	// Render the protected content

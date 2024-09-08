@@ -187,7 +187,6 @@ const AddItemForm = () => {
 							<Textarea
 								id="remarks"
 								placeholder="Leave a comment..."
-								required
 								rows={6}
 								onChange={(e) => setRemarks(e.target.value)}
 							/>

@@ -1,0 +1,22 @@
+@keyframes blink {
+	0% {
+		opacity: 1;
+	} /* Fully visible */
+	25% {
+		opacity: 0.5;
+	}
+	50% {
+		opacity: 0;
+	} /* Invisible */
+	75% {
+		opacity: 0.5;
+	}
+	100% {
+		opacity: 1;
+	} /* Fully visible again */
+}
+
+/* Apply the animation to the element */
+.blinking {
+	animation: blink 3s infinite;
+}
