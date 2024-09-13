@@ -17,7 +17,7 @@ const ItemImage = ({ imagePath, alt, width, height }) => {
 			width={width}
 			height={height}
 			onLoad={() => URL.revokeObjectURL(imageUrl)}
-			className="object-contain transition-all hover:scale-150"
+			className="object-contain"
 		/>
 	);
 };
