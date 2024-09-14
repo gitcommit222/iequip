@@ -19,6 +19,7 @@ const AddItemForm = () => {
 	const [category, setCategory] = useState(0);
 	const [quantity, setQuantity] = useState(1);
 	const [unit, setUnit] = useState("Pcs");
+	const [itemCondition, setItemCondition] = useState(null);
 	const [file, setFile] = useState(null);
 	const [remarks, setRemarks] = useState("");
 
@@ -45,6 +46,8 @@ const AddItemForm = () => {
 			quantity,
 			remarks,
 			barcode,
+			unit,
+			item_condition: itemCondition,
 		};
 
 		if (!file) {
@@ -152,7 +155,7 @@ const AddItemForm = () => {
 							</div>
 							<div className="max-w-[180px] w-[180px]">
 								<div className="mb-2 block">
-									<Label htmlFor="unit" value="Item Name" />
+									<Label htmlFor="unit" value="Unit" />
 								</div>
 								<Select
 									id="unit"
@@ -160,25 +163,41 @@ const AddItemForm = () => {
 									value={unit}
 									required
 								>
-									<option>Unit</option>
-									<option>Set</option>
-									<option>Pcs</option>
+									<option value="Unit">Unit</option>
+									<option value="Set">Set</option>
+									<option value="Pcs">Pcs</option>
 								</Select>
 							</div>
 						</div>
-						<div>
-							<div className="mb-2 block">
-								<Label
-									htmlFor="file-upload-helper-text"
-									value="Upload Item Image"
+						<div className="flex gap-3">
+							<div className="flex-1">
+								<div className="mb-2 block">
+									<Label
+										htmlFor="file-upload-helper-text"
+										value="Upload Item Image"
+									/>
+								</div>
+								<FileInput
+									id="file-upload-helper-text"
+									className="text-[14px]"
+									onChange={(e) => setFile(e.target.files[0])}
 								/>
 							</div>
-							<FileInput
-								id="file-upload-helper-text"
-								className="text-[14px]"
-								helperText="SVG, PNG, JPG or GIF (MAX. 800x400px)."
-								onChange={(e) => setFile(e.target.files[0])}
-							/>
+							<div className="max-w-[180px] w-[180px]">
+								<div className="mb-2 block">
+									<Label htmlFor="itemCondition" value="Condition" />
+								</div>
+								<Select
+									id="itemCondition"
+									onChange={(e) => setItemCondition(e.target.value)}
+									value={unit}
+									required
+								>
+									<option value="Good">Good</option>
+									<option value="Slightly Damaged">Slightly Damaged</option>
+									<option value="Damaged">Damaged</option>
+								</Select>
+							</div>
 						</div>
 						<div>
 							<div className="mb-2 block">

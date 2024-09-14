@@ -94,7 +94,7 @@ const Items = () => {
 							<Table.HeadCell>Unit</Table.HeadCell>
 							<Table.HeadCell>Barcode</Table.HeadCell>
 							<Table.HeadCell>Images</Table.HeadCell>
-							<Table.HeadCell>Remarks</Table.HeadCell>
+							<Table.HeadCell>Condition</Table.HeadCell>
 							<Table.HeadCell>Issued At</Table.HeadCell>
 							<Table.HeadCell>
 								<span>Actions</span>
@@ -110,7 +110,7 @@ const Items = () => {
 									>
 										<Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
 											<Tooltip content={item.name}>
-												{truncateText(item.name, 20)}
+												{truncateText(item?.name, 20)}
 											</Tooltip>
 										</Table.Cell>
 										<Table.Cell>{item.quantity}</Table.Cell>
@@ -167,7 +167,7 @@ const Items = () => {
 												width={50}
 											/>
 										</Table.Cell>
-										<Table.Cell>{truncateText(item.remarks, 10)}</Table.Cell>
+										<Table.Cell>{item.condition}</Table.Cell>
 										<Table.Cell>08-31-2024</Table.Cell>
 										<Table.Cell className="flex gap-2">
 											<Button size="xs" className="font-medium">

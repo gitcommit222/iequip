@@ -24,7 +24,7 @@ const ProtectedRoute = ({ children }) => {
 	}
 
 	// Render the protected content
-	return <>{children}</>;
+	return <>{user && children}</>;
 };
 
 export default ProtectedRoute;
