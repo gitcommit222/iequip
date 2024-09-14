@@ -56,38 +56,21 @@ const AddItemForm = () => {
 		}
 
 		try {
-			await addItemMutation({ file, itemData });
+			toast.promise(addItemMutation({ file, itemData }), {
+				success: "Item added!",
+				loading: "Adding item...",
+				error: "Error adding item.",
+			});
 			setCategory(0);
 			setItemName("");
 			setQuantity(1);
 			setRemarks("");
 			setFile(null);
-			console.log("Item added successfully");
+			setOpenModal(false);
 		} catch (error) {
 			console.error("Error adding item:", error.message);
 		}
 	};
-
-	useEffect(() => {
-		let toastId;
-
-		if (isAddItemPending) {
-			// Show loading toast and store the ID
-			toastId = toast.loading("Adding Item");
-		}
-
-		if (isAddItemSuccess) {
-			// Update the loading toast to success and close modal
-			toast.success("Item added successfully!", { id: toastId });
-			setOpenModal(false);
-		}
-		return () => {
-			// Clean up: Dismiss the toast if the component unmounts or process ends unexpectedly
-			if (toastId) {
-				toast.dismiss(toastId);
-			}
-		};
-	}, [isAddItemSuccess, isAddItemPending, setOpenModal]);
 
 	return (
 		<>

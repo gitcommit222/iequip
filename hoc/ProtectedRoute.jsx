@@ -14,16 +14,14 @@ const ProtectedRoute = ({ children }) => {
 			router.push("/sign-in");
 		}
 		if (isError) {
-			toast.error("Session expired, please sign-in.");
+			toast.error("Please sign-in.");
 		}
 	});
 
-	// Show loader while checking authentication state
 	if (!user && !isLoading) {
 		return <Loader />;
 	}
 
-	// Render the protected content
 	return <>{user && children}</>;
 };
 

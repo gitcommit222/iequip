@@ -1,16 +1,17 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import Barcode from "react-barcode";
 import { toPng } from "html-to-image";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { CiCircleCheck } from "react-icons/ci";
 import { FaRegTrashCan } from "react-icons/fa6";
 import { CiEdit } from "react-icons/ci";
+import { FaImage } from "react-icons/fa6";
 
 import Headerbox from "../../../components/shared/Headerbox";
 import ItemImage from "../../../components/ItemImage";
 
-import { Table, Button, Tooltip } from "flowbite-react";
+import { Table, Button, Tooltip, Badge } from "flowbite-react";
 import Link from "next/link";
 import Image from "next/image";
 import { saveBtn, view } from "../../../public";
@@ -19,6 +20,7 @@ import { useDeleteItems, useGetItems } from "../../../hooks/useItem";
 
 import CustomPopover from "../../../components/shared/Popover";
 import AddItemForm from "../../../components/AddItemForm";
+import CustomModal from "../../../components/shared/CustomModal";
 
 import { truncateText } from "../../../helpers/truncateText";
 import toast from "react-hot-toast";
@@ -26,28 +28,7 @@ import toast from "react-hot-toast";
 const Items = () => {
 	const barcodeRef = useRef();
 
-	const {
-		mutateAsync: deleteItem,
-		isSuccess: isDeleteItemSuccess,
-		isPending: isDeleteItemPending,
-	} = useDeleteItems();
-
-	useEffect(() => {
-		let toastId;
-
-		if (isDeleteItemPending) {
-			toastId = toast.loading("Deleting Item");
-		}
-
-		if (isDeleteItemSuccess) {
-			toast.success("Item deleted successfully!", { id: toastId });
-		}
-		return () => {
-			if (toastId) {
-				toast.dismiss(toastId);
-			}
-		};
-	}, [isDeleteItemSuccess, isDeleteItemPending]);
+	const { mutateAsync: deleteItem } = useDeleteItems();
 
 	const {
 		data: items,
@@ -55,6 +36,14 @@ const Items = () => {
 		isError: isFetchingItemError,
 		error: fetchItemError,
 	} = useGetItems();
+
+	const handleDeleteItem = (itemId) => {
+		toast.promise(deleteItem(itemId), {
+			success: "Item deleted",
+			loading: "Deleting...",
+			error: "Can't delete item",
+		});
+	};
 
 	const downloadBarcode = () => {
 		if (barcodeRef.current) {
@@ -92,9 +81,9 @@ const Items = () => {
 							<Table.HeadCell>Stocks</Table.HeadCell>
 							<Table.HeadCell>Category</Table.HeadCell>
 							<Table.HeadCell>Unit</Table.HeadCell>
+							<Table.HeadCell>Condition</Table.HeadCell>
 							<Table.HeadCell>Barcode</Table.HeadCell>
 							<Table.HeadCell>Images</Table.HeadCell>
-							<Table.HeadCell>Condition</Table.HeadCell>
 							<Table.HeadCell>Issued At</Table.HeadCell>
 							<Table.HeadCell>
 								<span>Actions</span>
@@ -116,7 +105,15 @@ const Items = () => {
 										<Table.Cell>{item.quantity}</Table.Cell>
 										<Table.Cell>{categoriesList[item.category]}</Table.Cell>
 										<Table.Cell>pcs</Table.Cell>
-										<Table.Cell>
+										<Table.Cell className="w-[15px]">
+											<Badge
+												color="success"
+												className="text-center flex items-center"
+											>
+												<p>Good</p>
+											</Badge>
+										</Table.Cell>
+										<Table.Cell className="flex items-center justify-center">
 											<CustomPopover
 												trigger="hover"
 												title="Item barcode"
@@ -147,27 +144,33 @@ const Items = () => {
 													</div>
 												}
 												button={
-													<Button size="xs" className="bg-green-500">
+													<Button size="xs" color="gray">
 														<Image
 															src={view}
 															alt="view"
 															height={15}
 															width={15}
-															className="brightness-0 invert"
 														/>
 													</Button>
 												}
 											/>
 										</Table.Cell>
 										<Table.Cell>
-											<ItemImage
-												imagePath={item.image_path}
-												alt="item image"
-												height={50}
-												width={50}
+											<CustomModal
+												btnTitle={<FaImage />}
+												btnColor="gray"
+												btnSize="sm"
+												headerTitle={item.name}
+												mainContent={
+													<ItemImage
+														imagePath={item?.image_path}
+														width={600}
+														height={400}
+													/>
+												}
 											/>
 										</Table.Cell>
-										<Table.Cell>{item.condition}</Table.Cell>
+										<Table.Cell>{truncateText(item.remarks, 10)}</Table.Cell>
 										<Table.Cell>08-31-2024</Table.Cell>
 										<Table.Cell className="flex gap-2">
 											<Button size="xs" className="font-medium">
@@ -190,22 +193,8 @@ const Items = () => {
 															You want to delete this item?
 														</p>
 														<div className="flex gap-3 items-center justify-center">
-															{/* <Button
-																className="flex items-center gap-1 justify-center"
-																pill
-																size="xs"
-																color="gray"
-															>
-																<div className="flex items-center gap-1 justify-center">
-																	<IoIosCloseCircleOutline
-																		className="text-red-500"
-																		size={23}
-																	/>
-																	<p>No</p>
-																</div>
-															</Button> */}
 															<Button
-																onClick={async () => deleteItem(item.id)}
+																onClick={() => handleDeleteItem(item?.id)}
 																pill
 																size="xs"
 																color="gray"
