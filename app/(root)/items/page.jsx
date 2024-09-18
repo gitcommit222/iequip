@@ -25,6 +25,8 @@ import CustomModal from "../../../components/shared/CustomModal";
 import { truncateText } from "../../../helpers/truncateText";
 import toast from "react-hot-toast";
 
+import { categoriesList } from "../../../lib/categories";
+
 const Items = () => {
 	const barcodeRef = useRef();
 
@@ -59,8 +61,6 @@ const Items = () => {
 				});
 		}
 	};
-
-	const categoriesList = ["Flood & Typhoon", "Tsunami", "Covid-19"];
 
 	return (
 		<section>
@@ -104,13 +104,23 @@ const Items = () => {
 										</Table.Cell>
 										<Table.Cell>{item.quantity}</Table.Cell>
 										<Table.Cell>{categoriesList[item.category]}</Table.Cell>
-										<Table.Cell>pcs</Table.Cell>
-										<Table.Cell className="w-[15px]">
+										<Table.Cell>{item.unit}</Table.Cell>
+										<Table.Cell className="w-[20px] text-center">
 											<Badge
-												color="success"
-												className="text-center flex items-center"
+												color={
+													item.item_condition == "Good"
+														? "success"
+														: item.item_condition == "Slightly Damaged"
+														? "warning"
+														: "failure"
+												}
+												className="text-[12px] "
 											>
-												<p>Good</p>
+												<Tooltip content={item.item_condition}>
+													<p className="text-center">
+														{truncateText(item.item_condition, 9)}
+													</p>
+												</Tooltip>
 											</Badge>
 										</Table.Cell>
 										<Table.Cell className="flex items-center justify-center">
@@ -166,26 +176,22 @@ const Items = () => {
 														imagePath={item?.image_path}
 														width={600}
 														height={400}
+														className="object-contain"
 													/>
 												}
 											/>
 										</Table.Cell>
-										<Table.Cell>{truncateText(item.remarks, 10)}</Table.Cell>
 										<Table.Cell>08-31-2024</Table.Cell>
 										<Table.Cell className="flex gap-2">
-											<Button size="xs" className="font-medium">
-												<CiEdit size={12} />
-											</Button>
+											<button className="font-medium text-cyan-600">
+												Edit
+											</button>
 											<CustomPopover
 												title="Are you sure?"
 												button={
-													<Button
-														color="failure"
-														size="xs"
-														className="font-medium "
-													>
-														<FaRegTrashCan size={12} />
-													</Button>
+													<button className="font-medium text-red-500">
+														Delete
+													</button>
 												}
 												content={
 													<div className="p-3">

@@ -1,22 +1,26 @@
+"use client";
 import React from "react";
 import HeaderBox from "../../components/shared/Headerbox";
 import InfoBox from "../../components/InfoBox";
-import LineChart from "../../components/BarChart";
 import BarChart from "../../components/BarChart";
 import PieChart from "../../components/PieChart";
+import { useGetItems } from "../../hooks/useItem";
 
 const Home = () => {
+	const { data: items, isLoading } = useGetItems();
+
+	const totalItems = items && items?.items?.length;
 	return (
 		<section>
 			<HeaderBox
 				title="Hello,"
-				user="Admin"
+				user="User"
 				type="greeting"
 				subtext="Track your data progress here."
 			/>
 			<div className="space-y-6">
 				<div className="flex gap-4 flex-wrap">
-					<InfoBox title="Total Items" data={104} />
+					<InfoBox title="Total Items" data={isLoading ? "..." : totalItems} />
 					<InfoBox title="Borrowed Items" data={25} />
 					<InfoBox title="Returned Items" data={13} />
 					<InfoBox title="Lost Items" data={4} />

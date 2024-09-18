@@ -2,7 +2,7 @@ import React from "react";
 import { useItemImage } from "../hooks/useItem";
 import Image from "next/image";
 
-const ItemImage = ({ imagePath, alt, width, height }) => {
+const ItemImage = ({ imagePath, alt, width, height, className }) => {
 	const { data: imageBlob, isLoading, isError } = useItemImage(imagePath);
 
 	if (isLoading) return <div>Loading...</div>;
@@ -17,7 +17,7 @@ const ItemImage = ({ imagePath, alt, width, height }) => {
 			width={width}
 			height={height}
 			onLoad={() => URL.revokeObjectURL(imageUrl)}
-			className="object-contain"
+			className={className}
 		/>
 	);
 };

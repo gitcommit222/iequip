@@ -91,3 +91,23 @@ export const useDeleteItems = () => {
 		},
 	});
 };
+
+const getItemByBarcode = async (barcode) => {
+	try {
+		const response = await api.get(`/items/barcode/${barcode}`);
+		return response.data;
+	} catch (error) {
+		if (error.response && error.response.data && error.response.data.message) {
+			throw new Error(error.response.data.message);
+		}
+		throw new Error("An unexpected error occurred.");
+	}
+};
+
+export const useGetItemByBarcode = (barcode) => {
+	return useQuery({
+		queryKey: ["item", barcode],
+		queryFn: () => getItemByBarcode(barcode),
+		enabled: !!barcode,
+	});
+};
