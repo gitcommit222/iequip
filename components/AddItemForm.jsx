@@ -90,7 +90,7 @@ const AddItemForm = ({ data }) => {
 				onClose={() => setOpenModal(false)}
 				className="p-10"
 			>
-				<Modal.Body>
+				<Modal.Body className="hide-scrollbar">
 					<h1 className="text-[28px] font-medium mb-4">ADD ITEM FORM</h1>
 					<form className="space-y-4" onSubmit={handleSubmit}>
 						<div>

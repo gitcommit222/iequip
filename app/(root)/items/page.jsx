@@ -176,6 +176,7 @@ const Items = () => {
 														imagePath={item?.image_path}
 														width={600}
 														height={400}
+														alt="item image"
 														className="object-contain"
 													/>
 												}

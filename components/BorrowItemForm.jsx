@@ -1,6 +1,6 @@
 "use client";
 import { useFormik } from "formik";
-import { Button, Label, Modal, TextInput } from "flowbite-react";
+import { Button, Datepicker, Label, Modal, TextInput } from "flowbite-react";
 import { debounce } from "lodash";
 import { useEffect, useState } from "react";
 import { BorrowItemSchema } from "../lib/schema";
@@ -24,16 +24,17 @@ const BorrowItemForm = ({ data }) => {
 			contactNumber: data ? data.contactNumber : "",
 			fullAddress: data ? data.address : "",
 			department: data ? data.department : "",
-			status: data ? data.status : "",
 			itemBarcode: data ? data.barcode : "",
+			testedBy: data ? data.testedBy : "",
+			returnDate: data ? data.end_date : Date.now(),
 		},
 		validationSchema: BorrowItemSchema,
-		onSubmit: () => {
-			console.log("Working...");
-		},
+		onSubmit: ({ fullName, email, age, contactNumber, department }) => {},
 	});
 
 	const { values, errors, touched, handleChange, handleSubmit } = formik;
+
+	console.log(values.returnDate);
 
 	const {
 		data: itemWithBarcode,
@@ -267,7 +268,41 @@ const BorrowItemForm = ({ data }) => {
 											{itemError?.message}
 										</p>
 									)}
+									<div>
+										<div className="mb-1 block">
+											<Label htmlFor="returnDate" value="Return Date" />
+										</div>
+										<Datepicker
+											weekStart={1} // Monday
+											name="returnDate"
+											onChange={handleChange}
+											color={`${
+												errors.returnDate && touched.returnDate
+													? "failure"
+													: "gray"
+											}`}
+											helperText={errors.returnDate ? errors.returnDate : ""}
+										/>
+									</div>
+									<div>
+										<div className="mb-1 block">
+											<Label htmlFor="testedBy" value="Tested By" />
+										</div>
+										<TextInput
+											id="testedBy"
+											name="testedBy"
+											type="text"
+											placeholder="e.g. Kien Jayjan Peralta"
+											onChange={handleChange}
+											value={values.testedBy}
+											color={`${
+												errors.testedBy && touched.testedBy ? "failure" : "gray"
+											}`}
+											helperText={errors.testedBy ? errors.testedBy : ""}
+										/>
+									</div>
 								</div>
+
 								<div className="flex gap-2 w-full">
 									<Button
 										color="gray"
