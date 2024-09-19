@@ -223,8 +223,8 @@ const BorrowItemForm = ({ data }) => {
 											<div className="rounded-lg flex items-center gap-2">
 												<ItemImage
 													imagePath={itemWithBarcode.item.image_path}
-													width={100}
-													height={100}
+													width={60}
+													height={60}
 													className="object-contain rounded-lg"
 													alt="item image"
 												/>

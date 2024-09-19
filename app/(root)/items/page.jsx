@@ -73,7 +73,7 @@ const Items = () => {
 					<AddItemForm />
 				</div>
 			</div>
-			<div className=" border rounded-lg w-full min-h-[600px] bg-white z-100">
+			<div className=" border rounded-lg w-full min-h-[600px] bg-white">
 				<div>
 					<Table>
 						<Table.Head>
