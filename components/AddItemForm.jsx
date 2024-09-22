@@ -11,9 +11,10 @@ import {
 import { useState } from "react";
 import { useAddItem } from "../hooks/useItem";
 import toast from "react-hot-toast";
-import { useFormik } from "formik";
 import { addItemFormSchema } from "../lib/schema";
 import Image from "next/image";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 const AddItemForm = ({ data }) => {
 	const [file, setFile] = useState("");
@@ -26,20 +27,28 @@ const AddItemForm = ({ data }) => {
 		isPending: isAddItemPending,
 	} = useAddItem();
 
-	const formik = useFormik({
-		initialValues: {
+	const {
+		register,
+		handleSubmit,
+		reset,
+		setError,
+		setValue,
+		formState: { errors, isSubmitting },
+	} = useForm({
+		defaultValues: {
 			itemName: data ? data : "",
 			category: data ? data : 0,
 			quantity: data ? data : 1,
-			unit: data ? data : "Unit",
+			unit: data ? data : "",
 			itemCondition: data ? data : "",
 			file: data ? data : "",
 		},
-		validationSchema: addItemFormSchema,
-		onSubmit: async (
-			{ itemName, category, quantity, unit, itemCondition, file },
-			{ resetForm }
-		) => {
+		resolver: yupResolver(addItemFormSchema),
+	});
+
+	const onSubmit = async (data) => {
+		const { itemName, category, quantity, unit, itemCondition, file } = data;
+		try {
 			const itemLetters = itemName.substring(0, 3).toUpperCase();
 			const randomNum =
 				Math.floor(Math.random() * (9999999 - 1000000 + 1)) + 1000000;
@@ -68,17 +77,19 @@ const AddItemForm = ({ data }) => {
 					error: "Error adding item.",
 				});
 
-				resetForm();
+				reset();
 				setFile("");
 				setOpenModal(false);
 			} catch (error) {
 				console.error("Error adding item:", error.message);
 			}
-		},
-	});
-
-	const { handleSubmit, handleChange, values, errors, touched, setFieldValue } =
-		formik;
+			reset();
+		} catch (error) {
+			setError("root", {
+				message: "Invalid credentials",
+			});
+		}
+	};
 
 	return (
 		<>
@@ -92,21 +103,18 @@ const AddItemForm = ({ data }) => {
 			>
 				<Modal.Body className="hide-scrollbar">
 					<h1 className="text-[28px] font-medium mb-4">ADD ITEM FORM</h1>
-					<form className="space-y-4" onSubmit={handleSubmit}>
+					<form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
 						<div>
 							<div className="mb-2 block">
 								<Label htmlFor="itemName" value="Item Name" />
 							</div>
 							<TextInput
+								{...register("itemName")}
 								id="itemName"
 								type="text"
 								name="itemName"
-								onChange={handleChange}
-								value={values.itemName}
-								color={`${
-									errors.itemName && touched.itemName ? "failure" : "gray"
-								}`}
-								helperText={errors.itemName ? errors.itemName : ""}
+								color={`${errors.itemName ? "failure" : "gray"}`}
+								helperText={errors.itemName ? errors.itemName.message : ""}
 							/>
 						</div>
 						<div className="flex gap-3">
@@ -115,14 +123,11 @@ const AddItemForm = ({ data }) => {
 									<Label htmlFor="categories" value="Category" />
 								</div>
 								<Select
+									{...register("category")}
 									id="categories"
 									name="category"
-									onChange={handleChange}
-									value={values.category}
-									color={`${
-										errors.category && touched.category ? "failure" : "gray"
-									}`}
-									helperText={errors.category ? errors.category : ""}
+									color={`${errors.category ? "failure" : "gray"}`}
+									helperText={errors.category ? errors.category.name : ""}
 								>
 									<option value={0}>Flood & Typhoon</option>
 									<option value={1}>Tsunami</option>
@@ -134,16 +139,13 @@ const AddItemForm = ({ data }) => {
 									<Label htmlFor="itemCondition" value="Condition" />
 								</div>
 								<Select
+									{...register("itemCondition")}
 									id="itemCondition"
 									name="itemCondition"
-									onChange={handleChange}
-									value={values.itemCondition}
-									color={`${
-										errors.itemCondition && touched.itemCondition
-											? "failure"
-											: "gray"
-									}`}
-									helperText={errors.itemCondition ? errors.itemCondition : ""}
+									color={`${errors.itemCondition ? "failure" : "gray"}`}
+									helperText={
+										errors.itemCondition ? errors.itemCondition.message : ""
+									}
 								>
 									<option value="" disabled></option>
 									<option value="Good">Good</option>
@@ -158,13 +160,13 @@ const AddItemForm = ({ data }) => {
 									<Label htmlFor="unit" value="Unit" />
 								</div>
 								<Select
+									{...register("unit")}
 									id="unit"
 									name="unit"
-									onChange={handleChange}
-									value={values.unit}
-									color={`${errors.unit && touched.unit ? "failure" : "gray"}`}
-									helperText={errors.unit ? errors.unit : ""}
+									color={`${errors.unit ? "failure" : "gray"}`}
+									helperText={errors.unit ? errors.unit.message : ""}
 								>
+									<option value="" disabled></option>
 									<option value="Unit">Unit</option>
 									<option value="Set">Set</option>
 									<option value="Pcs">Pcs</option>
@@ -175,14 +177,11 @@ const AddItemForm = ({ data }) => {
 									<Label htmlFor="quantity" value="Quantity" />
 								</div>
 								<TextInput
+									{...register("quantity")}
 									id="quantity"
 									name="quantity"
-									onChange={handleChange}
-									value={values.quantity}
-									color={`${
-										errors.quantity && touched.quantity ? "failure" : "gray"
-									}`}
-									helperText={errors.quantity ? errors.quantity : ""}
+									color={`${errors.quantity ? "failure" : "gray"}`}
+									helperText={errors.quantity ? errors.quantity.message : ""}
 								/>
 							</div>
 						</div>
@@ -230,21 +229,20 @@ const AddItemForm = ({ data }) => {
 										)}
 									</div>
 									<FileInput
+										{...register("file")}
 										id="dropzone-file"
 										className="hidden"
 										accept="image/*"
 										onChange={(e) => {
 											const fileImage = e.target.files?.[0];
-											setFieldValue("file", fileImage);
+											setValue("file", fileImage);
 											setFile(
 												fileImage ? URL.createObjectURL(fileImage) : undefined
 											);
 										}}
 										name="quantity"
-										color={`${
-											errors.file && touched.file ? "failure" : "gray"
-										}`}
-										helperText={errors.file ? errors.file : ""}
+										color={`${errors.file ? "failure" : "gray"}`}
+										helperText={errors.file ? errors.file.message : ""}
 									/>
 								</Label>
 							</div>
@@ -261,9 +259,9 @@ const AddItemForm = ({ data }) => {
 								type="submit"
 								color="success"
 								className="text-white flex-1"
-								disabled={isAddItemPending}
+								disabled={isSubmitting}
 							>
-								{isAddItemPending ? (
+								{isSubmitting ? (
 									<Spinner aria-label="Default status example" />
 								) : (
 									"Submit"

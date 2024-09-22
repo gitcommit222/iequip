@@ -1,61 +1,112 @@
 "use client";
-import { useFormik } from "formik";
 import { Button, Datepicker, Label, Modal, TextInput } from "flowbite-react";
-import { debounce } from "lodash";
 import { useEffect, useState } from "react";
 import { BorrowItemSchema } from "../lib/schema";
-import { useGetItemByBarcode } from "../hooks/useItem";
 import ItemImage from "../components/ItemImage";
 
-import { categoriesList } from "../lib/categories";
+import { useGetItemByBarcode } from "../hooks/useItem";
+import { useBorrowItem } from "../hooks/useBorrowItem";
 
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+
+import { categoriesList } from "../lib/categories";
 import { FaCheckCircle } from "react-icons/fa";
 import { FaMinusCircle } from "react-icons/fa";
 import { FaCircleExclamation } from "react-icons/fa6";
+import toast from "react-hot-toast";
 
 const BorrowItemForm = ({ data }) => {
 	const [openModal, setOpenModal] = useState(false);
+	const [barcode, setBarcode] = useState("");
 
-	const formik = useFormik({
-		initialValues: {
-			fullName: data ? data.fullName : "",
-			email: data ? data.email : "",
-			age: data ? data.age : 18,
-			contactNumber: data ? data.contactNumber : "",
-			fullAddress: data ? data.address : "",
-			department: data ? data.department : "",
-			itemBarcode: data ? data.barcode : "",
-			testedBy: data ? data.testedBy : "",
-			returnDate: data ? data.end_date : Date.now(),
+	const { mutateAsync: borrowItemMutation, isSuccess: isBorrowItemSuccess } =
+		useBorrowItem();
+
+	const {
+		register,
+		handleSubmit,
+		reset,
+		setError,
+		trigger,
+		setValue,
+		getValues,
+		formState: { errors, isSubmitting },
+	} = useForm({
+		defaultValues: {
+			fullName: data?.fullName || "",
+			email: data?.email || "",
+			age: data?.age || 18,
+			contactNumber: data?.contactNumber || "",
+			fullAddress: data?.address || "",
+			department: data?.department || "",
+			itemBarcode: data?.barcode || "",
+			testedBy: data?.testedBy || "",
+			returnDate: data?.end_date || new Date().toISOString().split("T")[0],
 		},
-		validationSchema: BorrowItemSchema,
-		onSubmit: ({ fullName, email, age, contactNumber, department }) => {},
+		resolver: yupResolver(BorrowItemSchema),
 	});
-
-	const { values, errors, touched, handleChange, handleSubmit } = formik;
-
-	console.log(values.returnDate);
 
 	const {
 		data: itemWithBarcode,
 		isLoading: isItemLoading,
 		isError: isItemError,
 		error: itemError,
-	} = useGetItemByBarcode(
-		values.itemBarcode.length >= 11 ? values.itemBarcode : null
-	);
+	} = useGetItemByBarcode(barcode.length >= 11 ? barcode : null);
+
+	const handleSelectedDate = (date) => {
+		setValue("returnDate", new Date(date).toISOString().split("T")[0]);
+	};
+
+	console.log(getValues().returnDate);
+
+	const onSubmit = async (data) => {
+		const {
+			fullName,
+			email,
+			age,
+			contactNumber,
+			department,
+			fullAddress,
+			testedBy,
+			returnDate,
+		} = data;
+		try {
+			await toast.promise(
+				borrowItemMutation({
+					name: fullName,
+					email,
+					age,
+					contact_number: contactNumber,
+					department,
+					address: fullAddress,
+					item_id: itemWithBarcode?.item.id,
+					end_date: returnDate,
+					tested_by: testedBy,
+				}),
+				{
+					success: "Borrow Success!",
+					loading: "Loading...",
+					error: "Something went wrong.",
+				}
+			);
+
+			reset();
+			setBarcode("");
+			setOpenModal(false);
+		} catch (error) {
+			setError("root", {
+				message: "Invalid Inputs",
+			});
+		}
+	};
 
 	return (
 		<>
 			<Button color="success" onClick={() => setOpenModal(true)}>
 				Borrow
 			</Button>
-			<Modal
-				show={openModal}
-				size="xl"
-				onClose={() => setOpenModal(false)}
-				popup
-			>
+			<Modal show={openModal} onClose={() => setOpenModal(false)} popup>
 				<Modal.Body className="hide-scrollbar">
 					<div className="w-full py-4">
 						<div className="mb-4">
@@ -64,7 +115,7 @@ const BorrowItemForm = ({ data }) => {
 								Fill in the fields to complete the borrow request.
 							</p>
 						</div>
-						<form onSubmit={handleSubmit}>
+						<form onSubmit={handleSubmit(onSubmit)}>
 							<div>
 								<div className="flex-1 space-y-3 mb-5">
 									<h1 className="form-header">Borrowers Info</h1>
@@ -77,18 +128,15 @@ const BorrowItemForm = ({ data }) => {
 												/>
 											</div>
 											<TextInput
+												{...register("fullName")}
 												id="borrowerName"
 												name="fullName"
 												type="text"
 												placeholder="e.g. Juan Dela Cruz"
-												onChange={handleChange}
-												value={values.fullName}
-												color={`${
-													errors.fullName && touched.fullName
-														? "failure"
-														: "gray"
-												}`}
-												helperText={errors.fullName ? errors.fullName : ""}
+												color={`${errors.fullName ? "failure" : "gray"}`}
+												helperText={
+													errors.fullName ? errors.fullName.message : ""
+												}
 											/>
 										</div>
 										<div className="min-w-[85px]">
@@ -96,16 +144,13 @@ const BorrowItemForm = ({ data }) => {
 												<Label htmlFor="borrowerAge" value="Age" />
 											</div>
 											<TextInput
+												{...register("age")}
 												id="borrowerAge"
 												name="age"
 												type="number"
 												placeholder="e.g. 21"
-												onChange={handleChange}
-												value={values.age}
-												color={`${
-													errors.age && touched.age ? "failure" : "gray"
-												}`}
-												helperText={errors.age ? errors.age : ""}
+												color={`${errors.age ? "failure" : "gray"}`}
+												helperText={errors.age ? errors.age.message : ""}
 											/>
 										</div>
 									</div>
@@ -115,16 +160,13 @@ const BorrowItemForm = ({ data }) => {
 												<Label htmlFor="borrowerEmail" value="Email" />
 											</div>
 											<TextInput
+												{...register("email")}
 												id="borrowerEmail"
 												name="email"
-												type="email"
+												type="text"
 												placeholder="e.g. example@email.com"
-												onChange={handleChange}
-												value={values.email}
-												color={`${
-													errors.email && touched.email ? "failure" : "gray"
-												}`}
-												helperText={errors.email ? errors.email : ""}
+												color={`${errors.email ? "failure" : "gray"}`}
+												helperText={errors.email ? errors.email.message : ""}
 											/>
 										</div>
 										<div className="flex-1">
@@ -132,40 +174,34 @@ const BorrowItemForm = ({ data }) => {
 												<Label htmlFor="contactNumber" value="Contact Number" />
 											</div>
 											<TextInput
+												{...register("contactNumber")}
 												id="contactNumber"
 												name="contactNumber"
 												type="text"
 												placeholder="e.g. 09123456789"
-												onChange={handleChange}
-												value={values.contactNumber}
-												color={`${
-													errors.contactNumber && touched.contactNumber
-														? "failure"
-														: "gray"
-												}`}
+												color={`${errors.contactNumber ? "failure" : "gray"}`}
 												helperText={
-													errors.contactNumber ? errors.contactNumber : ""
+													errors.contactNumber
+														? errors.contactNumber.message
+														: ""
 												}
 											/>
 										</div>
 									</div>
 									<div className="field-container">
 										<div className="mb-1 block">
-											<Label htmlFor="borrowerName" value="Full Address" />
+											<Label htmlFor="fullAddress" value="Full Address" />
 										</div>
 										<TextInput
-											id="borrowerName"
+											{...register("fullAddress")}
+											id="fullAddress"
 											name="fullAddress"
 											type="text"
 											placeholder="e.g. House no. Street, Barangay, Municipality, Province"
-											onChange={handleChange}
-											value={values.fullAddress}
-											color={`${
-												errors.fullAddress && touched.fullAddress
-													? "failure"
-													: "gray"
-											}`}
-											helperText={errors.fullAddress ? errors.fullAddress : ""}
+											color={`${errors.fullAddress ? "failure" : "gray"}`}
+											helperText={
+												errors.fullAddress ? errors.fullAddress.message : ""
+											}
 										/>
 									</div>
 									<div className="field-container">
@@ -176,18 +212,15 @@ const BorrowItemForm = ({ data }) => {
 											/>
 										</div>
 										<TextInput
+											{...register("department")}
 											id="department"
 											name="department"
 											type="text"
 											placeholder="e.g. Provincial Governor's Office (PGO)"
-											onChange={handleChange}
-											value={values.department}
-											color={`${
-												errors.department && touched.department
-													? "failure"
-													: "gray"
-											}`}
-											helperText={errors.department ? errors.department : ""}
+											color={`${errors.department ? "failure" : "gray"}`}
+											helperText={
+												errors.department ? errors.department.message : ""
+											}
 										/>
 									</div>
 								</div>
@@ -200,21 +233,27 @@ const BorrowItemForm = ({ data }) => {
 										<div className="flex gap-2">
 											<div className="flex-1">
 												<TextInput
+													{...register("itemBarcode")}
 													id="itemBarcode"
 													type="text"
 													placeholder="e.g. ITE12312312"
 													name="itemBarcode"
-													onChange={handleChange}
-													value={values.itemBarcode}
-													color={`${
-														errors.itemBarcode && touched.itemBarcode
-															? "failure"
-															: "gray"
-													}`}
+													color={`${errors.itemBarcode ? "failure" : "gray"}`}
 													helperText={
-														errors.itemBarcode ? errors.itemBarcode : ""
+														errors.itemBarcode ? errors.itemBarcode.message : ""
 													}
 												/>
+											</div>
+											<div>
+												<Button
+													onClick={() => {
+														setBarcode(getValues().itemBarcode);
+														trigger("itemBarcode");
+													}}
+													color="gray"
+												>
+													Search
+												</Button>
 											</div>
 										</div>
 									</div>
@@ -263,9 +302,9 @@ const BorrowItemForm = ({ data }) => {
 											</div>
 										</div>
 									)}
-									{isItemError && !isItemLoading && (
+									{isItemError && itemError && (
 										<p className="text-center text-[14px] text-gray-500">
-											{itemError?.message}
+											Item Not found.
 										</p>
 									)}
 									<div>
@@ -273,15 +312,14 @@ const BorrowItemForm = ({ data }) => {
 											<Label htmlFor="returnDate" value="Return Date" />
 										</div>
 										<Datepicker
-											weekStart={1} // Monday
+											{...register("returnDate")}
+											weekStart={1}
 											name="returnDate"
-											onChange={handleChange}
-											color={`${
-												errors.returnDate && touched.returnDate
-													? "failure"
-													: "gray"
-											}`}
-											helperText={errors.returnDate ? errors.returnDate : ""}
+											color={`${errors.returnDate ? "failure" : "gray"}`}
+											helperText={
+												errors.returnDate ? errors.returnDate.message : ""
+											}
+											onSelectedDateChanged={handleSelectedDate}
 										/>
 									</div>
 									<div>
@@ -289,20 +327,18 @@ const BorrowItemForm = ({ data }) => {
 											<Label htmlFor="testedBy" value="Tested By" />
 										</div>
 										<TextInput
+											{...register("testedBy")}
 											id="testedBy"
 											name="testedBy"
 											type="text"
 											placeholder="e.g. Kien Jayjan Peralta"
-											onChange={handleChange}
-											value={values.testedBy}
-											color={`${
-												errors.testedBy && touched.testedBy ? "failure" : "gray"
-											}`}
-											helperText={errors.testedBy ? errors.testedBy : ""}
+											color={`${errors.testedBy ? "failure" : "gray"}`}
+											helperText={
+												errors.testedBy ? errors.testedBy.message : ""
+											}
 										/>
 									</div>
 								</div>
-
 								<div className="flex gap-2 w-full">
 									<Button
 										color="gray"
@@ -311,8 +347,13 @@ const BorrowItemForm = ({ data }) => {
 									>
 										Cancel
 									</Button>
-									<Button color="success" type="submit" className="flex-1">
-										Confirm
+									<Button
+										disabled={isSubmitting}
+										color="success"
+										type="submit"
+										className="flex-1"
+									>
+										{isSubmitting ? "Submitting.." : "Confirm"}
 									</Button>
 								</div>
 							</div>

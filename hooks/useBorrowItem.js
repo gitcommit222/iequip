@@ -48,3 +48,20 @@ export const useBorrowItem = () => {
 		},
 	});
 };
+
+const fetchBorrowedItems = async () => {
+	try {
+		const response = await api.get("/items/borrowed-items");
+
+		return response.data;
+	} catch (error) {
+		console.log(error);
+	}
+};
+
+export const useFetchBorrowedItems = () => {
+	return useQuery({
+		queryKey: ["borrowedItems"],
+		queryFn: fetchBorrowedItems,
+	});
+};
