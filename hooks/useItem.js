@@ -111,3 +111,28 @@ export const useGetItemByBarcode = (barcode) => {
 		enabled: !!barcode,
 	});
 };
+
+const updateItem = async ({ itemId, newItemData }) => {
+	try {
+		const response = await api.put(`/items/update/${itemId}`, {
+			...newItemData,
+		});
+
+		return response.data;
+	} catch (error) {
+		if (error.response && error.response.data && error.response.data.message) {
+			throw new Error(error.response.data.message);
+		}
+		throw new Error("An unexpected error occurred.");
+	}
+};
+
+export const useUpdateItem = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: updateItem,
+		onSuccess: () => {
+			queryClient.invalidateQueries(["item", "items"]);
+		},
+	});
+};

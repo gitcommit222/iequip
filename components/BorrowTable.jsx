@@ -1,6 +1,7 @@
 "use client";
 import { Table } from "flowbite-react";
 import { useFetchBorrowedItems } from "../hooks/useBorrowItem";
+import { format } from "date-fns";
 
 const BorrowTable = () => {
 	const {
@@ -8,6 +9,10 @@ const BorrowTable = () => {
 		isError: isFetchItemsError,
 		isLoading: isItemFetching,
 	} = useFetchBorrowedItems();
+
+	if (borrowedItems && !isItemFetching) {
+		console.log(borrowedItems);
+	}
 
 	return (
 		<div className="overflow-x-auto shadow-sm">
@@ -31,13 +36,13 @@ const BorrowTable = () => {
 								className="bg-white dark:border-gray-700 dark:bg-gray-800"
 							>
 								<Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-									Kien Peralta
+									{item.Borrower.name}
 								</Table.Cell>
-								<Table.Cell>09123456789</Table.Cell>
-								<Table.Cell>kien@email.com</Table.Cell>
-								<Table.Cell>Basket Stretcher</Table.Cell>
+								<Table.Cell>{item.Borrower.contact_number}</Table.Cell>
+								<Table.Cell>{item.Borrower.email}</Table.Cell>
+								<Table.Cell>{item.Item?.name || "-"}</Table.Cell>
 								<Table.Cell>09/15/24</Table.Cell>
-								<Table.Cell>{item.end_date}</Table.Cell>
+								<Table.Cell>{format(item.end_date, "dd-MM-yyy")}</Table.Cell>
 								<Table.Cell>{item.status}</Table.Cell>
 								<Table.Cell>
 									<a

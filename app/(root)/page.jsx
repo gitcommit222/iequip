@@ -5,6 +5,7 @@ import InfoBox from "../../components/InfoBox";
 import BarChart from "../../components/BarChart";
 import PieChart from "../../components/PieChart";
 import { useGetItems } from "../../hooks/useItem";
+import NotifDrawer from "../../components/NotifDrawer";
 
 const Home = () => {
 	const { data: items, isLoading } = useGetItems();
@@ -12,12 +13,17 @@ const Home = () => {
 	const totalItems = items && items?.items?.length;
 	return (
 		<section>
-			<HeaderBox
-				title="Hello,"
-				user="User"
-				type="greeting"
-				subtext="Track your data progress here."
-			/>
+			<div className="flex items-center justify-between">
+				<HeaderBox
+					title="Hello,"
+					user="User"
+					type="greeting"
+					subtext="Track your data progress here."
+				/>
+				<div>
+					<NotifDrawer />
+				</div>
+			</div>
 			<div className="space-y-6">
 				<div className="flex gap-4 flex-wrap">
 					<InfoBox title="Total Items" data={isLoading ? "..." : totalItems} />

@@ -4,11 +4,7 @@ export const navLinks = [
 		url: "/",
 		icon: "/icons/gauge-solid.svg",
 	},
-	{
-		label: "Notifications",
-		url: "/notifications",
-		icon: "/icons/bell-solid.svg",
-	},
+
 	{
 		label: "Borrow",
 		url: "/borrow",

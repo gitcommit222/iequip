@@ -8,16 +8,36 @@ import {
 	Modal,
 	Spinner,
 } from "flowbite-react";
-import { useState } from "react";
-import { useAddItem } from "../hooks/useItem";
+import { useEffect, useState } from "react";
+import {
+	useAddItem,
+	useGetItemByBarcode,
+	useItemImage,
+	useUpdateItem,
+} from "../hooks/useItem";
 import toast from "react-hot-toast";
 import { addItemFormSchema } from "../lib/schema";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { categoriesList } from "../lib/categories";
 
-const AddItemForm = ({ data }) => {
+const AddItemForm = ({
+	data,
+	className,
+	btnTitle = "New Item",
+	type = "add",
+	itemId,
+}) => {
 	const [file, setFile] = useState("");
+
+	const {
+		data: imageBlob,
+		isLoading,
+		isError,
+	} = useItemImage(data ? data.image_path : undefined);
+
+	const imageUrl = imageBlob ? URL.createObjectURL(imageBlob) : "";
 
 	const [openModal, setOpenModal] = useState(false);
 
@@ -26,6 +46,8 @@ const AddItemForm = ({ data }) => {
 		isSuccess: isAddItemSuccess,
 		isPending: isAddItemPending,
 	} = useAddItem();
+
+	const { mutateAsync: updateItem } = useUpdateItem();
 
 	const {
 		register,
@@ -36,18 +58,19 @@ const AddItemForm = ({ data }) => {
 		formState: { errors, isSubmitting },
 	} = useForm({
 		defaultValues: {
-			itemName: data ? data : "",
-			category: data ? data : 0,
-			quantity: data ? data : 1,
-			unit: data ? data : "",
-			itemCondition: data ? data : "",
-			file: data ? data : "",
+			itemName: data ? data?.name : "",
+			category: data ? data.category : 0,
+			quantity: data ? data.quantity : 1,
+			unit: data ? data.unit : "",
+			itemCondition: data ? data.item_condition : "",
+			file: data ? data.image_path : "",
 		},
 		resolver: yupResolver(addItemFormSchema),
 	});
 
 	const onSubmit = async (data) => {
 		const { itemName, category, quantity, unit, itemCondition, file } = data;
+
 		try {
 			const itemLetters = itemName.substring(0, 3).toUpperCase();
 			const randomNum =
@@ -63,27 +86,40 @@ const AddItemForm = ({ data }) => {
 				item_condition: itemCondition,
 			};
 
-			console.log(itemName);
-
 			if (!file) {
 				console.error("No file selected");
 				return;
 			}
+			if (type === "add") {
+				try {
+					await toast.promise(addItemMutation({ file, itemData }), {
+						success: "Item added!",
+						loading: "Adding item...",
+						error: "Error adding item.",
+					});
 
-			try {
-				await toast.promise(addItemMutation({ file, itemData }), {
-					success: "Item added!",
-					loading: "Adding item...",
-					error: "Error adding item.",
-				});
+					reset();
+					setFile("");
+					setOpenModal(false);
+				} catch (error) {
+					console.error("Error adding item:", error.message);
+				}
+			} else {
+				console.log(itemData);
+				try {
+					await toast.promise(updateItem({ itemId, newItemData: itemData }), {
+						success: "Item updated!",
+						loading: "Updating item...",
+						error: "Error updating item.",
+					});
 
-				reset();
-				setFile("");
-				setOpenModal(false);
-			} catch (error) {
-				console.error("Error adding item:", error.message);
+					reset();
+					setFile("");
+					setOpenModal(false);
+				} catch (error) {
+					console.error("Error adding item:", error.message);
+				}
 			}
-			reset();
 		} catch (error) {
 			setError("root", {
 				message: "Invalid credentials",
@@ -93,9 +129,9 @@ const AddItemForm = ({ data }) => {
 
 	return (
 		<>
-			<Button color="success" size="md" onClick={() => setOpenModal(true)}>
-				New Item
-			</Button>
+			<button className={`${className}`} onClick={() => setOpenModal(true)}>
+				{btnTitle}
+			</button>
 			<Modal
 				show={openModal}
 				onClose={() => setOpenModal(false)}
@@ -129,9 +165,11 @@ const AddItemForm = ({ data }) => {
 									color={`${errors.category ? "failure" : "gray"}`}
 									helperText={errors.category ? errors.category.name : ""}
 								>
-									<option value={0}>Flood & Typhoon</option>
-									<option value={1}>Tsunami</option>
-									<option value={2}>Covid-19</option>
+									{categoriesList.map((cat, i) => (
+										<option key={i} value={i}>
+											{cat}
+										</option>
+									))}
 								</Select>
 							</div>
 							<div className="max-w-[180px] w-[180px]">
@@ -199,6 +237,13 @@ const AddItemForm = ({ data }) => {
 											<Image
 												src={file}
 												alt="selectedImage"
+												fill
+												className="object-contain"
+											/>
+										) : imageUrl ? (
+											<Image
+												src={imageUrl}
+												alt="defaultImage"
 												fill
 												className="object-contain"
 											/>

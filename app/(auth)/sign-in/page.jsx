@@ -112,7 +112,7 @@ const SignIn = () => {
 						className="bg-green-500"
 						color="success"
 					>
-						{isSubmitting ? "Submiting" : "Submit"}
+						{isSubmitting ? "Logging in..." : "Login"}
 					</Button>
 					<p className="text-gray2 text-[14px] text-center">
 						Don't have an account?{" "}
