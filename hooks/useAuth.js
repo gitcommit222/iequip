@@ -2,9 +2,16 @@ import api from "../utils/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const loginUser = async ({ email, password }) => {
-	const response = await api.post("/users/auth", { email, password });
+	try {
+		const response = await api.post("/users/auth", { email, password });
 
-	return response.data;
+		return response.data;
+	} catch (error) {
+		if (error.response && error.response.data && error.response.data.message) {
+			throw new Error(error.response.data.message);
+		}
+		throw new Error("An unexpected error occurred.");
+	}
 };
 
 export const useLogin = () => {
@@ -13,6 +20,7 @@ export const useLogin = () => {
 	return useMutation({
 		mutationFn: loginUser,
 		onSuccess: (data) => queryClient.setQueryData(["user"], data.user),
+		onError: () => {},
 	});
 };
 

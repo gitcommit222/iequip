@@ -7,32 +7,58 @@ import Link from "next/link";
 import { useLogin } from "../../../hooks/useAuth";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { signInSchema } from "../../../lib/schema";
 
 const SignIn = () => {
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
-
 	const loginMutation = useLogin();
 
 	const router = useRouter();
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
+	const {
+		register,
+		handleSubmit,
+		reset,
+		setError,
+		formState: { errors, isSubmitting },
+	} = useForm({
+		defaultValues: {
+			email: "",
+			password: "",
+		},
+		resolver: yupResolver(signInSchema),
+	});
+
+	const onSubmit = async (data) => {
+		const { email, password } = data;
 		try {
 			await loginMutation.mutateAsync({ email, password });
+			reset();
 		} catch (error) {
-			console.error("Login failed:");
+			setError("root", {
+				message: "Invalid credentials",
+			});
 		}
 	};
 
+	console.log("re-render");
+
 	useEffect(() => {
-		if (loginMutation.isSuccess) {
-			toast.success(loginMutation.data.message);
+		const { isSuccess, isError, data, error } = loginMutation;
+
+		if (isSuccess) {
+			toast.success(data?.message);
 			router.push("/");
-			setEmail("");
-			setPassword("");
+		} else if (isError) {
+			console.error("Login failed:", error);
 		}
-	}, [loginMutation.isSuccess]);
+	}, [
+		loginMutation.isSuccess,
+		loginMutation.isError,
+		loginMutation.data,
+		loginMutation.error,
+	]);
 
 	return (
 		<div className="space-y-4 font-Montserrat px-10">
@@ -43,20 +69,22 @@ const SignIn = () => {
 				</p>
 			</div>
 			<div>
-				<form className="flex max-w-md flex-col gap-4" onSubmit={handleSubmit}>
+				<form
+					className="flex max-w-md flex-col gap-4"
+					onSubmit={handleSubmit(onSubmit)}
+				>
 					<div>
 						<div className="mb-2 block">
 							<Label htmlFor="email1" value="Your email" />
 						</div>
 						<TextInput
 							id="email1"
-							type="email"
+							type="text"
 							placeholder="example@email.com"
-							color="gray"
-							required
+							color={errors.email ? "failure" : "gray"}
+							helperText={errors.email && errors.email.message}
 							className="focused:ring-green-500"
-							onChange={(e) => setEmail(e.target.value)}
-							value={email}
+							{...register("email")}
 						/>
 					</div>
 					<div>
@@ -70,13 +98,21 @@ const SignIn = () => {
 							id="password1"
 							type="password"
 							className="focus:ring-green-500 focus:border-green-500"
-							onChange={(e) => setPassword(e.target.value)}
-							value={password}
-							required
+							{...register("password")}
+							color={errors.password ? "failure" : "gray"}
+							helperText={errors.password && errors.password.message}
 						/>
 					</div>
-					<Button type="submit" className="bg-green-500">
-						Submit
+					{errors.root && (
+						<div className="text-red-500">{errors.root.message}</div>
+					)}
+					<Button
+						type="submit"
+						disabled={isSubmitting}
+						className="bg-green-500"
+						color="success"
+					>
+						{isSubmitting ? "Logging in..." : "Login"}
 					</Button>
 					<p className="text-gray2 text-[14px] text-center">
 						Don't have an account?{" "}

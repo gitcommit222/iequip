@@ -13,7 +13,7 @@ const borrowItem = async ({
 	tested_by,
 	remarks,
 }) => {
-	const response = await api.post("/items/borrow", {
+	const response = await api.post("/borrow/borrow-item", {
 		name,
 		email,
 		age,
@@ -46,5 +46,22 @@ export const useBorrowItem = () => {
 			}
 			throw new Error("An unexpected error occurred.");
 		},
+	});
+};
+
+const fetchBorrowedItems = async () => {
+	try {
+		const response = await api.get("/borrow/");
+
+		return response.data;
+	} catch (error) {
+		console.log(error);
+	}
+};
+
+export const useFetchBorrowedItems = () => {
+	return useQuery({
+		queryKey: ["borrowedItems"],
+		queryFn: fetchBorrowedItems,
 	});
 };

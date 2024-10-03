@@ -8,15 +8,36 @@ import {
 	Modal,
 	Spinner,
 } from "flowbite-react";
-import { useState } from "react";
-import { useAddItem } from "../hooks/useItem";
+import { useEffect, useState } from "react";
+import {
+	useAddItem,
+	useGetItemByBarcode,
+	useItemImage,
+	useUpdateItem,
+} from "../hooks/useItem";
 import toast from "react-hot-toast";
-import { useFormik } from "formik";
 import { addItemFormSchema } from "../lib/schema";
 import Image from "next/image";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { categoriesList } from "../lib/categories";
 
-const AddItemForm = ({ data }) => {
+const AddItemForm = ({
+	data,
+	className,
+	btnTitle = "New Item",
+	type = "add",
+	itemId,
+}) => {
 	const [file, setFile] = useState("");
+
+	const {
+		data: imageBlob,
+		isLoading,
+		isError,
+	} = useItemImage(data ? data.image_path : undefined);
+
+	const imageUrl = imageBlob ? URL.createObjectURL(imageBlob) : "";
 
 	const [openModal, setOpenModal] = useState(false);
 
@@ -26,20 +47,31 @@ const AddItemForm = ({ data }) => {
 		isPending: isAddItemPending,
 	} = useAddItem();
 
-	const formik = useFormik({
-		initialValues: {
-			itemName: data ? data : "",
-			category: data ? data : 0,
-			quantity: data ? data : 1,
-			unit: data ? data : "Unit",
-			itemCondition: data ? data : "",
-			file: data ? data : "",
+	const { mutateAsync: updateItem } = useUpdateItem();
+
+	const {
+		register,
+		handleSubmit,
+		reset,
+		setError,
+		setValue,
+		formState: { errors, isSubmitting },
+	} = useForm({
+		defaultValues: {
+			itemName: data ? data?.name : "",
+			category: data ? data.category : 0,
+			quantity: data ? data.quantity : 1,
+			unit: data ? data.unit : "",
+			itemCondition: data ? data.item_condition : "",
+			file: data ? data.image_path : "",
 		},
-		validationSchema: addItemFormSchema,
-		onSubmit: async (
-			{ itemName, category, quantity, unit, itemCondition, file },
-			{ resetForm }
-		) => {
+		resolver: yupResolver(addItemFormSchema),
+	});
+
+	const onSubmit = async (data) => {
+		const { itemName, category, quantity, unit, itemCondition, file } = data;
+
+		try {
 			const itemLetters = itemName.substring(0, 3).toUpperCase();
 			const randomNum =
 				Math.floor(Math.random() * (9999999 - 1000000 + 1)) + 1000000;
@@ -54,37 +86,52 @@ const AddItemForm = ({ data }) => {
 				item_condition: itemCondition,
 			};
 
-			console.log(itemName);
-
 			if (!file) {
 				console.error("No file selected");
 				return;
 			}
+			if (type === "add") {
+				try {
+					await toast.promise(addItemMutation({ file, itemData }), {
+						success: "Item added!",
+						loading: "Adding item...",
+						error: "Error adding item.",
+					});
 
-			try {
-				await toast.promise(addItemMutation({ file, itemData }), {
-					success: "Item added!",
-					loading: "Adding item...",
-					error: "Error adding item.",
-				});
+					reset();
+					setFile("");
+					setOpenModal(false);
+				} catch (error) {
+					console.error("Error adding item:", error.message);
+				}
+			} else {
+				console.log(itemData);
+				try {
+					await toast.promise(updateItem({ itemId, newItemData: itemData }), {
+						success: "Item updated!",
+						loading: "Updating item...",
+						error: "Error updating item.",
+					});
 
-				resetForm();
-				setFile("");
-				setOpenModal(false);
-			} catch (error) {
-				console.error("Error adding item:", error.message);
+					reset();
+					setFile("");
+					setOpenModal(false);
+				} catch (error) {
+					console.error("Error adding item:", error.message);
+				}
 			}
-		},
-	});
-
-	const { handleSubmit, handleChange, values, errors, touched, setFieldValue } =
-		formik;
+		} catch (error) {
+			setError("root", {
+				message: "Invalid credentials",
+			});
+		}
+	};
 
 	return (
 		<>
-			<Button color="success" size="md" onClick={() => setOpenModal(true)}>
-				New Item
-			</Button>
+			<button className={`${className}`} onClick={() => setOpenModal(true)}>
+				{btnTitle}
+			</button>
 			<Modal
 				show={openModal}
 				onClose={() => setOpenModal(false)}
@@ -92,21 +139,18 @@ const AddItemForm = ({ data }) => {
 			>
 				<Modal.Body className="hide-scrollbar">
 					<h1 className="text-[28px] font-medium mb-4">ADD ITEM FORM</h1>
-					<form className="space-y-4" onSubmit={handleSubmit}>
+					<form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
 						<div>
 							<div className="mb-2 block">
 								<Label htmlFor="itemName" value="Item Name" />
 							</div>
 							<TextInput
+								{...register("itemName")}
 								id="itemName"
 								type="text"
 								name="itemName"
-								onChange={handleChange}
-								value={values.itemName}
-								color={`${
-									errors.itemName && touched.itemName ? "failure" : "gray"
-								}`}
-								helperText={errors.itemName ? errors.itemName : ""}
+								color={`${errors.itemName ? "failure" : "gray"}`}
+								helperText={errors.itemName ? errors.itemName.message : ""}
 							/>
 						</div>
 						<div className="flex gap-3">
@@ -115,18 +159,17 @@ const AddItemForm = ({ data }) => {
 									<Label htmlFor="categories" value="Category" />
 								</div>
 								<Select
+									{...register("category")}
 									id="categories"
 									name="category"
-									onChange={handleChange}
-									value={values.category}
-									color={`${
-										errors.category && touched.category ? "failure" : "gray"
-									}`}
-									helperText={errors.category ? errors.category : ""}
+									color={`${errors.category ? "failure" : "gray"}`}
+									helperText={errors.category ? errors.category.name : ""}
 								>
-									<option value={0}>Flood & Typhoon</option>
-									<option value={1}>Tsunami</option>
-									<option value={2}>Covid-19</option>
+									{categoriesList.map((cat, i) => (
+										<option key={i} value={i}>
+											{cat}
+										</option>
+									))}
 								</Select>
 							</div>
 							<div className="max-w-[180px] w-[180px]">
@@ -134,16 +177,13 @@ const AddItemForm = ({ data }) => {
 									<Label htmlFor="itemCondition" value="Condition" />
 								</div>
 								<Select
+									{...register("itemCondition")}
 									id="itemCondition"
 									name="itemCondition"
-									onChange={handleChange}
-									value={values.itemCondition}
-									color={`${
-										errors.itemCondition && touched.itemCondition
-											? "failure"
-											: "gray"
-									}`}
-									helperText={errors.itemCondition ? errors.itemCondition : ""}
+									color={`${errors.itemCondition ? "failure" : "gray"}`}
+									helperText={
+										errors.itemCondition ? errors.itemCondition.message : ""
+									}
 								>
 									<option value="" disabled></option>
 									<option value="Good">Good</option>
@@ -158,13 +198,13 @@ const AddItemForm = ({ data }) => {
 									<Label htmlFor="unit" value="Unit" />
 								</div>
 								<Select
+									{...register("unit")}
 									id="unit"
 									name="unit"
-									onChange={handleChange}
-									value={values.unit}
-									color={`${errors.unit && touched.unit ? "failure" : "gray"}`}
-									helperText={errors.unit ? errors.unit : ""}
+									color={`${errors.unit ? "failure" : "gray"}`}
+									helperText={errors.unit ? errors.unit.message : ""}
 								>
+									<option value="" disabled></option>
 									<option value="Unit">Unit</option>
 									<option value="Set">Set</option>
 									<option value="Pcs">Pcs</option>
@@ -175,14 +215,11 @@ const AddItemForm = ({ data }) => {
 									<Label htmlFor="quantity" value="Quantity" />
 								</div>
 								<TextInput
+									{...register("quantity")}
 									id="quantity"
 									name="quantity"
-									onChange={handleChange}
-									value={values.quantity}
-									color={`${
-										errors.quantity && touched.quantity ? "failure" : "gray"
-									}`}
-									helperText={errors.quantity ? errors.quantity : ""}
+									color={`${errors.quantity ? "failure" : "gray"}`}
+									helperText={errors.quantity ? errors.quantity.message : ""}
 								/>
 							</div>
 						</div>
@@ -200,6 +237,13 @@ const AddItemForm = ({ data }) => {
 											<Image
 												src={file}
 												alt="selectedImage"
+												fill
+												className="object-contain"
+											/>
+										) : imageUrl ? (
+											<Image
+												src={imageUrl}
+												alt="defaultImage"
 												fill
 												className="object-contain"
 											/>
@@ -230,21 +274,20 @@ const AddItemForm = ({ data }) => {
 										)}
 									</div>
 									<FileInput
+										{...register("file")}
 										id="dropzone-file"
 										className="hidden"
 										accept="image/*"
 										onChange={(e) => {
 											const fileImage = e.target.files?.[0];
-											setFieldValue("file", fileImage);
+											setValue("file", fileImage);
 											setFile(
 												fileImage ? URL.createObjectURL(fileImage) : undefined
 											);
 										}}
 										name="quantity"
-										color={`${
-											errors.file && touched.file ? "failure" : "gray"
-										}`}
-										helperText={errors.file ? errors.file : ""}
+										color={`${errors.file ? "failure" : "gray"}`}
+										helperText={errors.file ? errors.file.message : ""}
 									/>
 								</Label>
 							</div>
@@ -261,9 +304,9 @@ const AddItemForm = ({ data }) => {
 								type="submit"
 								color="success"
 								className="text-white flex-1"
-								disabled={isAddItemPending}
+								disabled={isSubmitting}
 							>
-								{isAddItemPending ? (
+								{isSubmitting ? (
 									<Spinner aria-label="Default status example" />
 								) : (
 									"Submit"
