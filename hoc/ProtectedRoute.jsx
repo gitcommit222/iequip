@@ -14,7 +14,9 @@ const ProtectedRoute = ({ children }) => {
 			router.push("/sign-in");
 		}
 		if (isError) {
-			toast.error("Please sign-in.");
+			toast("Please sign in!", {
+				icon: "😊",
+			});
 		}
 	});
 

@@ -21,7 +21,6 @@ import { useDeleteItems, useGetItems } from "../../../hooks/useItem";
 import CustomPopover from "../../../components/shared/Popover";
 import AddItemForm from "../../../components/AddItemForm";
 import CustomModal from "../../../components/shared/CustomModal";
-import NotifDrawer from "../../../components/NotifDrawer";
 
 import { truncateText } from "../../../helpers/truncateText";
 import toast from "react-hot-toast";
@@ -73,7 +72,7 @@ const Items = () => {
 					subtext="Manage and keep track of your items here."
 				/>
 				<div>
-					<AddItemForm className="text-[14px] border border-gray-300 p-2 rounded-md hover:text-green-400" />
+					<AddItemForm className="text-[12px] border border-gray-300 p-3 rounded-md hover:text-green-400" />
 				</div>
 			</div>
 			<div className=" border rounded-lg w-full min-h-[600px] bg-white">
@@ -87,7 +86,6 @@ const Items = () => {
 							<Table.HeadCell>Condition</Table.HeadCell>
 							<Table.HeadCell>Barcode</Table.HeadCell>
 							<Table.HeadCell>Images</Table.HeadCell>
-							<Table.HeadCell>Issued At</Table.HeadCell>
 							<Table.HeadCell>
 								<span>Actions</span>
 							</Table.HeadCell>
@@ -185,7 +183,6 @@ const Items = () => {
 												}
 											/>
 										</Table.Cell>
-										<Table.Cell>08-31-2024</Table.Cell>
 										<Table.Cell className="flex gap-2">
 											<AddItemForm
 												className="text-cyan-500 font-medium"

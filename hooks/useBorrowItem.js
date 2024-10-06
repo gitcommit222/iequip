@@ -65,3 +65,39 @@ export const useFetchBorrowedItems = () => {
 		queryFn: fetchBorrowedItems,
 	});
 };
+
+const getBorrowedItemById = async (itemId) => {
+	try {
+		const response = await api.get(`/borrow/borrowed/${itemId}`);
+
+		return response.data;
+	} catch (error) {
+		console.log(error);
+	}
+};
+
+export const useGetBorrowedItemById = (itemId) => {
+	return useQuery({
+		queryKey: ["borrowedItem", itemId],
+		queryFn: () => getBorrowedItemById(itemId),
+		enabled: !!itemId,
+	});
+};
+
+const returnItem = async ({ newCondition, borrowItemId }) => {
+	const response = await api.put(`/borrow/return/${borrowItemId}`, {
+		newCondition,
+	});
+
+	return response.data;
+};
+
+export const useReturnItem = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: returnItem,
+		onSuccess: () => {
+			queryClient.invalidateQueries(["borrowedItems"]);
+		},
+	});
+};

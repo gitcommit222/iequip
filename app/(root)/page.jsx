@@ -6,6 +6,7 @@ import BarChart from "../../components/BarChart";
 import PieChart from "../../components/PieChart";
 import { useGetItems } from "../../hooks/useItem";
 import NotifDrawer from "../../components/NotifDrawer";
+import { borrowedItem, item, lostItem, returnedItem } from "../../public";
 
 const Home = () => {
 	const { data: items, isLoading } = useGetItems();
@@ -26,10 +27,14 @@ const Home = () => {
 			</div>
 			<div className="space-y-6">
 				<div className="flex gap-4 flex-wrap">
-					<InfoBox title="Total Items" data={isLoading ? "..." : totalItems} />
-					<InfoBox title="Borrowed Items" data={25} />
-					<InfoBox title="Returned Items" data={13} />
-					<InfoBox title="Lost Items" data={4} />
+					<InfoBox
+						title="Total Items"
+						data={isLoading ? "..." : totalItems}
+						iconUrl={item}
+					/>
+					<InfoBox title="Borrowed Items" data={25} iconUrl={borrowedItem} />
+					<InfoBox title="Returned Items" data={13} iconUrl={returnedItem} />
+					<InfoBox title="Lost Items" data={4} iconUrl={lostItem} />
 				</div>
 				<div className="flex flex-wrap items-center justify-center gap-3">
 					<div className="flex-1">

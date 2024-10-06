@@ -115,7 +115,7 @@ export const useGetItemByBarcode = (barcode) => {
 const updateItem = async ({ itemId, newItemData }) => {
 	try {
 		const response = await api.put(`/items/update/${itemId}`, {
-			...newItemData,
+			newItemData,
 		});
 
 		return response.data;
@@ -132,7 +132,7 @@ export const useUpdateItem = () => {
 	return useMutation({
 		mutationFn: updateItem,
 		onSuccess: () => {
-			queryClient.invalidateQueries(["item", "items"]);
+			queryClient.invalidateQueries(["items"]);
 		},
 	});
 };

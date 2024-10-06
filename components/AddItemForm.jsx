@@ -70,6 +70,7 @@ const AddItemForm = ({
 
 	const onSubmit = async (data) => {
 		const { itemName, category, quantity, unit, itemCondition, file } = data;
+		console.log("!!!UNIT: " + unit);
 
 		try {
 			const itemLetters = itemName.substring(0, 3).toUpperCase();
@@ -105,7 +106,6 @@ const AddItemForm = ({
 					console.error("Error adding item:", error.message);
 				}
 			} else {
-				console.log(itemData);
 				try {
 					await toast.promise(updateItem({ itemId, newItemData: itemData }), {
 						success: "Item updated!",
@@ -208,6 +208,7 @@ const AddItemForm = ({
 									<option value="Unit">Unit</option>
 									<option value="Set">Set</option>
 									<option value="Pcs">Pcs</option>
+									<option value="Pack">Pack</option>
 								</Select>
 							</div>
 							<div className="max-w-[180px] w-[180px]">

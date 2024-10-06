@@ -18,7 +18,7 @@ export default function NotifDrawer({ color = "gray" }) {
 				</Tooltip>
 			</div>
 			<Drawer open={isOpenDrawer} onClose={handleClose} position="right">
-				<Drawer.Header title="Notifications" />
+				<Drawer.Header title="Notifications" titleIcon={GoBell} />
 				<Drawer.Items></Drawer.Items>
 			</Drawer>
 		</>
