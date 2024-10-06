@@ -1,6 +1,7 @@
 "use client";
 import { Button, Datepicker, Label, Modal, TextInput } from "flowbite-react";
-import { useEffect, useState } from "react";
+import { debounce } from "lodash";
+import { useCallback, useEffect, useState } from "react";
 import { BorrowItemSchema } from "../lib/schema";
 import ItemImage from "../components/ItemImage";
 
@@ -18,34 +19,33 @@ import toast from "react-hot-toast";
 
 const BorrowItemForm = ({ data }) => {
 	const [openModal, setOpenModal] = useState(false);
-	const [barcode, setBarcode] = useState("");
 
-	const { mutateAsync: borrowItemMutation, isSuccess: isBorrowItemSuccess } =
-		useBorrowItem();
-
-	const {
-		register,
-		handleSubmit,
-		reset,
-		setError,
-		trigger,
-		setValue,
-		getValues,
-		formState: { errors, isSubmitting },
-	} = useForm({
-		defaultValues: {
-			fullName: data?.fullName || "",
-			email: data?.email || "",
-			age: data?.age || 18,
-			contactNumber: data?.contactNumber || "",
-			fullAddress: data?.address || "",
-			department: data?.department || "",
-			itemBarcode: data?.barcode || "",
-			testedBy: data?.testedBy || "",
-			returnDate: data?.end_date || new Date().toISOString().split("T")[0],
+	const formik = useFormik({
+		initialValues: {
+			fullName: data ? data.fullName : "",
+			email: data ? data.email : "",
+			age: data ? data.age : 18,
+			contactNumber: data ? data.contactNumber : "",
+			fullAddress: data ? data.address : "",
+			department: data ? data.department : "",
+			itemBarcode: data ? data.barcode : "",
+			testedBy: data ? data.testedBy : "",
+			returnDate: data ? new Date(data.end_date) : new Date(),
 		},
 		resolver: yupResolver(BorrowItemSchema),
 	});
+
+	const { values, errors, touched, handleChange, handleSubmit, setFieldValue } =
+		formik;
+
+	console.log(new Date(values.returnDate));
+
+	const handleBarcodeChange = useCallback(
+		debounce((value) => {
+			setFieldValue("itemBarcode", value);
+		}, 300),
+		[values.itemBarcode]
+	);
 
 	const {
 		data: itemWithBarcode,
@@ -133,10 +133,16 @@ const BorrowItemForm = ({ data }) => {
 												name="fullName"
 												type="text"
 												placeholder="e.g. Juan Dela Cruz"
-												color={`${errors.fullName ? "failure" : "gray"}`}
-												helperText={
-													errors.fullName ? errors.fullName.message : ""
+												onChange={(e) =>
+													setFieldValue("fullName", e.target.value)
 												}
+												value={values.fullName}
+												color={`${
+													errors.fullName && touched.fullName
+														? "failure"
+														: "gray"
+												}`}
+												helperText={errors.fullName ? errors.fullName : ""}
 											/>
 										</div>
 										<div className="min-w-[85px]">
@@ -238,7 +244,13 @@ const BorrowItemForm = ({ data }) => {
 													type="text"
 													placeholder="e.g. ITE12312312"
 													name="itemBarcode"
-													color={`${errors.itemBarcode ? "failure" : "gray"}`}
+													onChange={(e) => handleBarcodeChange(e.target.value)}
+													value={values.itemBarcode}
+													color={`${
+														errors.itemBarcode && touched.itemBarcode
+															? "failure"
+															: "gray"
+													}`}
 													helperText={
 														errors.itemBarcode ? errors.itemBarcode.message : ""
 													}
@@ -311,15 +323,19 @@ const BorrowItemForm = ({ data }) => {
 										<div className="mb-1 block">
 											<Label htmlFor="returnDate" value="Return Date" />
 										</div>
-										<Datepicker
-											{...register("returnDate")}
-											weekStart={1}
+										<input
+											type="date"
 											name="returnDate"
-											color={`${errors.returnDate ? "failure" : "gray"}`}
-											helperText={
-												errors.returnDate ? errors.returnDate.message : ""
+											value={
+												values.returnDate
+													? values.returnDate.toISOString().split("T")[0]
+													: ""
 											}
-											onSelectedDateChanged={handleSelectedDate}
+											onChange={(e) => {
+												setFieldValue("returnDate", new Date(e.target.value));
+											}}
+											onBlur={() => formik.setFieldTouched("returnDate", true)}
+											className="rounded-md border-gray-400 w-full"
 										/>
 									</div>
 									<div>
@@ -364,5 +380,7 @@ const BorrowItemForm = ({ data }) => {
 		</>
 	);
 };
+
+const ItemBarcode = ({ value, error, handleChange }) => {};
 
 export default BorrowItemForm;
