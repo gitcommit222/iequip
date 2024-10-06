@@ -1,6 +1,5 @@
 "use client";
 import { Button, Datepicker, Label, Modal, TextInput } from "flowbite-react";
-import { debounce } from "lodash";
 import { useCallback, useEffect, useState } from "react";
 import { BorrowItemSchema } from "../lib/schema";
 import ItemImage from "../components/ItemImage";
