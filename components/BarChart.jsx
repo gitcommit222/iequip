@@ -31,9 +31,9 @@ const BarChart = () => {
 		datasets: [
 			{
 				label: "Borrowed Items",
-				data: [12, 19, 3, 5, 2, 3, 9, 6, 4, 8, 15, 7], // Example data
-				backgroundColor: "rgba(75, 192, 192, 0.6)",
-				borderColor: "rgba(75, 192, 192, 1)",
+				data: [12, 19, 3, 5, 2, 3, 9, 6, 4, 8, 15, 7],
+				backgroundColor: "rgba(53, 162, 235, 0.5)",
+				borderColor: "rgb(53, 162, 235)",
 				borderWidth: 1,
 			},
 		],
@@ -42,15 +42,37 @@ const BarChart = () => {
 	const barOptions = {
 		responsive: true,
 		maintainAspectRatio: false,
+		plugins: {
+			legend: {
+				position: "top",
+			},
+			title: {
+				display: true,
+				text: "Monthly Borrowed Items",
+				font: {
+					size: 16,
+				},
+			},
+		},
 		scales: {
 			y: {
 				beginAtZero: true,
+				title: {
+					display: true,
+					text: "Number of Items",
+				},
+			},
+			x: {
+				title: {
+					display: true,
+					text: "Month",
+				},
 			},
 		},
 	};
 
 	return (
-		<div style={{ width: "100%", height: "400px" }}>
+		<div style={{ width: "100%", height: "400px", padding: "20px" }}>
 			<Bar data={barData} options={barOptions} />
 		</div>
 	);
