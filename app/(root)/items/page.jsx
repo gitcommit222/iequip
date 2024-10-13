@@ -186,7 +186,7 @@ const Items = () => {
 										<Table.Cell className="flex gap-2">
 											<AddItemForm
 												className="text-cyan-500 font-medium"
-												btnTitle="edit"
+												btnTitle="Edit"
 												itemId={item.id}
 												data={item}
 												type="edit"
