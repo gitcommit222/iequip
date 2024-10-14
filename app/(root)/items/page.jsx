@@ -115,7 +115,7 @@ const Items = () => {
 														? "warning"
 														: "failure"
 												}
-												className="text-[12px] "
+												className="text-[12px] text-nowrap"
 											>
 												<Tooltip content={item.item_condition}>
 													<p className="text-center">
@@ -124,7 +124,7 @@ const Items = () => {
 												</Tooltip>
 											</Badge>
 										</Table.Cell>
-										<Table.Cell className="flex items-center justify-center">
+										<Table.Cell>
 											<CustomPopover
 												trigger="hover"
 												title="Item barcode"

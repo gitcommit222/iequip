@@ -68,7 +68,7 @@ export const useFetchBorrowedItems = () => {
 
 const getBorrowedItemById = async (itemId) => {
 	try {
-		const response = await api.get(`/borrow/borrowed/${itemId}`);
+		const response = await api.get(`/borrow/${itemId}`);
 
 		return response.data;
 	} catch (error) {

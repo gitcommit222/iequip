@@ -1,6 +1,6 @@
 "use client";
 import { Button, Datepicker, Label, Modal, TextInput } from "flowbite-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BorrowItemSchema } from "../lib/schema";
 import ItemImage from "../components/ItemImage";
 
@@ -61,12 +61,14 @@ const BorrowItemForm = ({ data }) => {
 	} = useGetItemByBarcode(watchedBarcode?.length >= 11 ? watchedBarcode : null);
 
 	const onSubmit = async (formData) => {
-		console.log(formData);
 		try {
 			await toast.promise(
 				borrowItemMutation.mutateAsync({
-					...formData,
+					name: formData.fullName,
+					email: formData.email,
+					age: formData.age,
 					contact_number: formData.contactNumber,
+					department: formData.department,
 					address: formData.fullAddress,
 					item_id: itemWithBarcode?.item.id,
 					end_date: formData.returnDate,

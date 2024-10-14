@@ -11,19 +11,27 @@ import { FaCheckCircle } from "react-icons/fa";
 import { FaMinusCircle } from "react-icons/fa";
 import { FaCircleExclamation } from "react-icons/fa6";
 import { Button, Label, Select } from "flowbite-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const BorrowedItemPage = ({ params }) => {
 	const bItemId = params.borrowedItemId;
 
 	const [newCondition, setNewCondition] = useState("");
 
-	const { mutateAsync: returnItem, isPending: isReturnItemPending } =
-		useReturnItem();
+	const {
+		mutateAsync: returnItem,
+		isPending: isReturnItemPending,
+		isSuccess: isReturnItemSuccess,
+	} = useReturnItem();
 
 	const { data: borrowedItem, isLoading: isItemLoading } =
 		useGetBorrowedItemById(parseInt(bItemId));
+
+	console.log(borrowedItem);
+
+	const router = useRouter();
 
 	const handleReturnItem = async () => {
 		try {
@@ -38,19 +46,25 @@ const BorrowedItemPage = ({ params }) => {
 			console.error("Error returning item:", error.message);
 		}
 	};
+	useEffect(() => {
+		if (isReturnItemSuccess) {
+			router.push("/borrow");
+		}
+	}, [isReturnItemSuccess]);
 
 	return (
 		<section>
 			<Headerbox
-				title={borrowedItem && borrowedItem?.borrowed?.Item?.name}
+				title={borrowedItem && borrowedItem?.borrowedItem?.Item?.name}
 				subtext={
-					borrowedItem && categoriesList[borrowedItem?.borrowed?.Item?.category]
+					borrowedItem &&
+					categoriesList[borrowedItem?.borrowedItem?.Item?.category]
 				}
 			/>
 			<div className="w-full border flex gap-3 bg-white rounded-md shadow-sm p-4">
 				<div className="w-[210px] flex items-center justify-center border rounded-md p-2">
 					<ItemImage
-						imagePath={borrowedItem?.borrowed?.Item?.image_path}
+						imagePath={borrowedItem?.borrowedItem?.Item?.image_path}
 						width={300}
 						height={200}
 						className="object-contain"
@@ -59,26 +73,27 @@ const BorrowedItemPage = ({ params }) => {
 				</div>
 				<div className=" flex-1 space-y-1">
 					<h1 className="font-bold text-[34px] ">
-						{borrowedItem?.borrowed?.Item?.name}
+						{borrowedItem?.borrowedItem?.Item?.name}
 					</h1>
 					<p className="text-gray-500">
-						{categoriesList[borrowedItem?.borrowed?.Item?.category]}
+						{categoriesList[borrowedItem?.borrowedItem?.Item?.category]}
 					</p>
 					<div
 						className={`mr-4 flex gap-2 items-center ${
-							borrowedItem?.borrowed?.Item?.item_condition === "Good"
+							borrowedItem?.borrowedItem?.Item?.item_condition === "Good"
 								? "text-primary"
-								: borrowedItem?.borrowed?.Item?.item_condition === "Damaged"
+								: borrowedItem?.borrowedItem?.Item?.item_condition === "Damaged"
 								? "text-red-500"
 								: "text-yellow-300"
 						}`}
 					>
 						<p className="text-[14px] font-medium">
-							{borrowedItem?.borrowed?.Item?.item_condition} Condition
+							{borrowedItem?.borrowedItem?.Item?.item_condition} Condition
 						</p>
-						{borrowedItem?.borrowed?.Item?.item_condition === "Good" ? (
+						{borrowedItem?.borrowedItem?.Item?.item_condition === "Good" ? (
 							<FaCheckCircle size={17} />
-						) : borrowedItem?.borrowed?.Item?.item_condition === "Damaged" ? (
+						) : borrowedItem?.borrowedItem?.Item?.item_condition ===
+						  "Damaged" ? (
 							<FaCircleExclamation size={17} />
 						) : (
 							<FaMinusCircle size={17} />
@@ -87,15 +102,21 @@ const BorrowedItemPage = ({ params }) => {
 					<div>
 						<p>
 							Date Borrowed -{" "}
-							{(borrowedItem &&
-								format(borrowedItem?.borrowed?.start_date, "MMMM dd, yyyy")) ||
-								"-"}
+							{borrowedItem?.borrowedItem?.start_date
+								? format(
+										new Date(borrowedItem?.borrowedItem.start_date),
+										"MMMM dd, yyyy"
+								  )
+								: "-"}
 						</p>
 						<p>
 							Expected Return Date -{" "}
-							{(borrowedItem &&
-								format(borrowedItem?.borrowed?.end_date, "MMMM dd, yyyy")) ||
-								"-"}
+							{borrowedItem?.borrowedItem?.end_date
+								? format(
+										new Date(borrowedItem?.borrowedItem.end_date),
+										"MMMM dd, yyyy"
+								  )
+								: "-"}
 						</p>
 					</div>
 				</div>
@@ -104,25 +125,25 @@ const BorrowedItemPage = ({ params }) => {
 					<p className="text-gray-500">
 						Borrower :{" "}
 						<span className="font-semibold text-black">
-							{borrowedItem?.borrowed?.Borrower.name}
+							{borrowedItem?.borrowedItem?.Borrower.name}
 						</span>
 					</p>
 					<p className="text-gray-500">
 						Contact No. :{" "}
 						<span className="font-semibold text-black">
-							{borrowedItem?.borrowed?.Borrower.contact_number}
+							{borrowedItem?.borrowedItem?.Borrower.contact_number}
 						</span>
 					</p>
 					<p className="text-gray-500">
 						Email :{" "}
 						<span className="font-semibold text-black">
-							{borrowedItem?.borrowed?.Borrower.email}
+							{borrowedItem?.borrowedItem?.Borrower.email}
 						</span>
 					</p>
 					<p className="text-gray-500">
 						Released By :{" "}
 						<span className="font-semibold text-black">
-							{borrowedItem?.borrowed?.released_by}
+							{borrowedItem?.borrowedItem?.released_by}
 						</span>
 					</p>
 				</div>
@@ -134,13 +155,15 @@ const BorrowedItemPage = ({ params }) => {
 						<Select
 							disabled={
 								isReturnItemPending ||
-								borrowedItem?.borrowed?.status === "returned"
+								borrowedItem?.borrowedItem?.status === "returned"
 							}
 							id="condition"
 							onChange={(e) => setNewCondition(e.target.value)}
 							value={newCondition}
 						>
-							<option>{borrowedItem?.borrowed?.Item?.item_condition}</option>
+							<option>
+								{borrowedItem?.borrowedItem?.Item?.item_condition}
+							</option>
 							<option>Good</option>
 							<option>Slightly Damaged</option>
 							<option>Damaged</option>
@@ -152,10 +175,10 @@ const BorrowedItemPage = ({ params }) => {
 						onClick={handleReturnItem}
 						disabled={
 							isReturnItemPending ||
-							borrowedItem?.borrowed.status === "returned"
+							borrowedItem?.borrowedItems?.status === "returned"
 						}
 					>
-						{borrowedItem?.borrowed.status === "returned"
+						{borrowedItem?.borrowedItems?.status === "returned"
 							? "Returned"
 							: "Return Item"}
 					</Button>

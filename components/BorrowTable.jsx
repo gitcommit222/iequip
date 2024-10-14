@@ -45,7 +45,7 @@ const BorrowTable = () => {
 								<Table.Cell>{item.status}</Table.Cell>
 								<Table.Cell className="flex gap-2">
 									<Tooltip content="View">
-										<Link href={`/borrow/${item.item_id}`}>
+										<Link href={`/borrow/${item?.item_id}`}>
 											<GrFormView size={23} className="text-blue-500" />
 										</Link>
 									</Tooltip>
