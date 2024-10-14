@@ -175,10 +175,10 @@ const BorrowedItemPage = ({ params }) => {
 						onClick={handleReturnItem}
 						disabled={
 							isReturnItemPending ||
-							borrowedItem?.borrowedItems?.status === "available"
+							borrowedItem?.borrowedItem?.status === "Available"
 						}
 					>
-						{borrowedItem?.borrowedItems?.status === "available"
+						{borrowedItem?.borrowedItem?.status === "Available"
 							? "Returned"
 							: "Return Item"}
 					</Button>
