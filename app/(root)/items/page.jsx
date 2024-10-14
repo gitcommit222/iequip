@@ -80,7 +80,6 @@ const Items = () => {
 					<Table>
 						<Table.Head>
 							<Table.HeadCell>Item name</Table.HeadCell>
-							<Table.HeadCell>Stocks</Table.HeadCell>
 							<Table.HeadCell>Category</Table.HeadCell>
 							<Table.HeadCell>Unit</Table.HeadCell>
 							<Table.HeadCell>Condition</Table.HeadCell>
@@ -103,7 +102,6 @@ const Items = () => {
 												{truncateText(item?.name, 20)}
 											</Tooltip>
 										</Table.Cell>
-										<Table.Cell>{item.quantity}</Table.Cell>
 										<Table.Cell>{categoriesList[item.category]}</Table.Cell>
 										<Table.Cell>{item.unit}</Table.Cell>
 										<Table.Cell className="w-[20px] text-center">
