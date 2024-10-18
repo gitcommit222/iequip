@@ -10,6 +10,7 @@ import { categoriesList } from "../../../../lib/categories";
 import { FaCheckCircle } from "react-icons/fa";
 import { FaMinusCircle } from "react-icons/fa";
 import { FaCircleExclamation } from "react-icons/fa6";
+
 import { Button, Label, Select } from "flowbite-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";

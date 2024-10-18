@@ -12,11 +12,9 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { format, parseISO } from "date-fns"; // Add parseISO import
 
 import { categoriesList } from "../lib/categories";
-import {
-	FaCheckCircle,
-	FaMinusCircle,
-	FaCircleExclamation,
-} from "react-icons/fa";
+import { FaCircleExclamation } from "react-icons/fa6";
+
+import { FaCheckCircle, FaMinusCircle } from "react-icons/fa";
 import toast from "react-hot-toast";
 
 const BorrowItemForm = ({ data }) => {

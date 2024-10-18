@@ -42,7 +42,7 @@ const BorrowTable = () => {
 								<Table.Cell>{item.Borrower.email}</Table.Cell>
 								<Table.Cell>{item.Item?.name || "-"}</Table.Cell>
 								<Table.Cell>09/15/24</Table.Cell>
-								<Table.Cell>{item.status}</Table.Cell>
+								<Table.Cell>{item?.status}</Table.Cell>
 								<Table.Cell className="flex gap-2">
 									<Tooltip content="View">
 										<Link href={`/borrow/${item?.item_id}`}>
