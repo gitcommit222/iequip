@@ -23,11 +23,11 @@ const Sidebar = () => {
 		let toastId;
 
 		if (isLogoutPending) {
-			// Show loading toast and store the ID
 			toastId = toast.loading("Logging out...");
 		}
 
 		if (isLogoutSuccess) {
+			toast.success("Logged out successfully");
 			router.push("/sign-in");
 		}
 
@@ -37,7 +37,17 @@ const Sidebar = () => {
 				toast.dismiss(toastId);
 			}
 		};
-	}, [isLogoutSuccess, isLogoutPending]);
+	}, [isLogoutSuccess, isLogoutPending, router]);
+
+	const handleLogout = async () => {
+		try {
+			console.log("Logout button clicked");
+			await logout();
+		} catch (error) {
+			console.error("Logout error:", error);
+			toast.error("Logout failed. Please try again.");
+		}
+	};
 
 	return (
 		<aside className="sidebar">
@@ -47,7 +57,7 @@ const Sidebar = () => {
 						<Image src={logo} alt="logo" width={150} height={106} />
 					</Link>
 				</div>
-				<nav className="sidebar-nav ">
+				<nav className="sidebar-nav">
 					<ul className="sidebar-nav_elements">
 						{navLinks.map((item) => {
 							const isActive = item.url === pathname;
@@ -75,13 +85,22 @@ const Sidebar = () => {
 							);
 						})}
 					</ul>
-					<button
-						onClick={async () => await logout()}
-						className="text-black flex justify-center items-center gap-3 text-[14px]"
-					>
-						<Image src={signout} alt="out" width={14} height={14} />
-						Logout
-					</button>
+					<li className="sidebar-nav_element group text-gray-600">
+						<button
+							onClick={handleLogout}
+							className="sidebar-link w-full flex items-center"
+							disabled={isLogoutPending}
+						>
+							<Image
+								src={signout}
+								alt="out"
+								width={18}
+								height={18}
+								className="brightness-0"
+							/>
+							<span>Logout</span>
+						</button>
+					</li>
 				</nav>
 			</div>
 		</aside>

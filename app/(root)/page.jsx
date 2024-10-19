@@ -8,16 +8,15 @@ import { useGetItems } from "../../hooks/useItem";
 import { useFetchBorrowedItems } from "../../hooks/useBorrowItem";
 import NotifDrawer from "../../components/NotifDrawer";
 import { borrowedItem, item, lostItem, returnedItem } from "../../public";
+import { useGetTransactionsByCategory } from "../../hooks/useTransactions";
 
 const Home = () => {
 	const { data: items, isLoading } = useGetItems();
-	const { data: borrowItems, isLoading: isBorrowItemsLoading } =
-		useFetchBorrowedItems();
+	const { data: transactions, isLoading: isBorrowItemsLoading } =
+		useGetTransactionsByCategory("items");
 
 	const totalItems = items && items?.items?.length;
-	const totalBorrowedItems = borrowItems && borrowItems?.borrowedItems?.length;
-
-	console.log(borrowItems);
+	const totalBorrowedItems = transactions && transactions?.length;
 
 	return (
 		<section>
@@ -56,14 +55,14 @@ const Home = () => {
 							<BarChart />
 						</div>
 					</div>
-					<div className="min-w-[40%]">
+					{/* <div className="min-w-[40%]">
 						<h1 className="font-semibold text-[17px] mb-1">
 							Most Borrowed Categories
 						</h1>
 						<div className="bg-white w-full h-[500px] rounded-lg flex items-center justify-center">
 							<PieChart />
 						</div>
-					</div>
+					</div> */}
 				</div>
 			</div>
 		</section>

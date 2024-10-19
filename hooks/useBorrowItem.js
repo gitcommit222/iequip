@@ -11,6 +11,7 @@ const borrowItem = async ({
 	item_id,
 	end_date,
 	tested_by,
+	item_qty,
 	remarks,
 }) => {
 	const response = await api.post("/borrow/borrow-item", {
@@ -24,6 +25,7 @@ const borrowItem = async ({
 		end_date,
 		tested_by,
 		remarks,
+		item_qty,
 	});
 
 	return response.data;

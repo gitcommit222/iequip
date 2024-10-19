@@ -5,7 +5,7 @@ import { BorrowItemSchema } from "../lib/schema";
 import ItemImage from "../components/ItemImage";
 
 import { useGetItemByBarcode } from "../hooks/useItem";
-import { useBorrowItem } from "../hooks/useBorrowItem";
+import { useCreateTransaction } from "../hooks/useTransactions";
 
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -21,7 +21,7 @@ const BorrowItemForm = ({ data }) => {
 	const [openModal, setOpenModal] = useState(false);
 	const [barcode, setBarcode] = useState("");
 
-	const borrowItemMutation = useBorrowItem();
+	const borrowItemMutation = useCreateTransaction();
 
 	const {
 		register,
@@ -41,6 +41,7 @@ const BorrowItemForm = ({ data }) => {
 			fullAddress: data?.address || "",
 			department: data?.department || "",
 			itemBarcode: data?.barcode || "",
+			itemQty: data?.quantity || 1,
 			testedBy: data?.testedBy || "",
 			returnDate: data?.end_date
 				? format(parseISO(data.end_date), "yyyy-MM-dd'T'HH:mm")
@@ -62,15 +63,21 @@ const BorrowItemForm = ({ data }) => {
 		try {
 			await toast.promise(
 				borrowItemMutation.mutateAsync({
-					name: formData.fullName,
-					email: formData.email,
-					age: formData.age,
-					contact_number: formData.contactNumber,
-					department: formData.department,
-					address: formData.fullAddress,
-					item_id: itemWithBarcode?.item.id,
-					end_date: formData.returnDate,
-					tested_by: formData.testedBy,
+					recipientInfo: {
+						name: formData.fullName,
+						email: formData.email,
+						age: formData.age,
+						contact_number: formData.contactNumber,
+						department: formData.department,
+						address: formData.fullAddress,
+					},
+					itemInfo: {
+						category: "items",
+						item_id: itemWithBarcode?.item.id,
+						borrowed_qty: formData.itemQty,
+						end_date: formData.returnDate,
+						tested_by: formData.testedBy,
+					},
 				}),
 				{
 					success: "Borrow Success!",
@@ -218,7 +225,7 @@ const BorrowItemForm = ({ data }) => {
 									</div>
 								</div>
 								<div className="space-y-3 mb-5">
-									<h1 className="form-header">Items</h1>
+									<h1 className="form-header">Item Info</h1>
 									<div>
 										<div className="mb-1 block">
 											<Label htmlFor="itemBarcode" value="Item Barcode" />
@@ -238,6 +245,7 @@ const BorrowItemForm = ({ data }) => {
 													}
 												/>
 											</div>
+
 											<div>
 												<Button
 													onClick={() => {
@@ -251,47 +259,101 @@ const BorrowItemForm = ({ data }) => {
 										</div>
 									</div>
 									{itemWithBarcode && !isItemLoading && (
-										<div className="item-container">
-											<div className="rounded-lg flex items-center gap-2">
-												<ItemImage
-													imagePath={itemWithBarcode.item.image_path}
-													width={60}
-													height={60}
-													className="object-contain rounded-lg"
-													alt="item image"
-												/>
+										<div className="flex flex-col gap-2 items-center">
+											<div className="item-container">
+												<div className="rounded-lg flex items-center gap-2">
+													<ItemImage
+														imagePath={itemWithBarcode.item.image_path}
+														width={60}
+														height={60}
+														className="object-contain rounded-lg"
+														alt="item image"
+													/>
+													<div>
+														<h3 className="font-semibold text-[20px]">
+															{itemWithBarcode.item?.name}
+														</h3>
+														<h5 className="text-gray-500 text-[14px]">
+															{categoriesList[itemWithBarcode.item.category]}
+														</h5>
+														<p className="text-gray-500 text-[14px]">
+															Stocks:{" "}
+															<span>{itemWithBarcode.item.quantity}</span>
+														</p>
+													</div>
+												</div>
 												<div>
-													<h3 className="font-semibold text-[20px]">
-														{itemWithBarcode.item?.name}
-													</h3>
-													<h5 className="text-gray-500 text-[14px]">
-														{categoriesList[itemWithBarcode.item.category]}
-													</h5>
-													<p className="text-gray-500 text-[14px]">
-														Stocks: <span>{itemWithBarcode.item.quantity}</span>
-													</p>
+													<div
+														className={`mr-4 flex gap-2 items-center ${
+															itemWithBarcode.item.item_condition === "Good"
+																? "text-primary"
+																: itemWithBarcode.item.item_condition ===
+																  "Damaged"
+																? "text-red-500"
+																: "text-yellow-300"
+														}`}
+													>
+														<p className="text-[14px] font-medium">
+															{itemWithBarcode.item.item_condition}
+														</p>
+														{itemWithBarcode.item.item_condition === "Good" ? (
+															<FaCheckCircle size={21} />
+														) : itemWithBarcode.item.item_condition ===
+														  "Damaged" ? (
+															<FaCircleExclamation size={21} />
+														) : (
+															<FaMinusCircle size={21} />
+														)}
+													</div>
+													<div className="max-w-[50px] mt-2">
+														<TextInput
+															{...register("itemQty")}
+															id="itemQty"
+															name="itemQty"
+															type="number"
+															className="hide-arrows"
+															color={`${errors.itemQty ? "failure" : "gray"}`}
+															helperText={
+																errors.itemQty ? errors.itemQty.message : ""
+															}
+															min={1}
+														/>
+													</div>
 												</div>
 											</div>
-											<div
-												className={`mr-4 flex gap-2 items-center ${
-													itemWithBarcode.item.item_condition === "Good"
-														? "text-primary"
-														: itemWithBarcode.item.item_condition === "Damaged"
-														? "text-red-500"
-														: "text-yellow-300"
-												}`}
-											>
-												<p className="text-[14px] font-medium">
-													{itemWithBarcode.item.item_condition}
-												</p>
-												{itemWithBarcode.item.item_condition === "Good" ? (
-													<FaCheckCircle size={21} />
-												) : itemWithBarcode.item.item_condition ===
-												  "Damaged" ? (
-													<FaCircleExclamation size={21} />
-												) : (
-													<FaMinusCircle size={21} />
-												)}
+											<div className="flex gap-2 w-full justify-start">
+												<div>
+													<div className="mb-1">
+														<Label htmlFor="returnDate" value="Return Date" />
+													</div>
+													<TextInput
+														{...register("returnDate")}
+														id="returnDate"
+														type="datetime-local"
+														color={`${errors.returnDate ? "failure" : "gray"}`}
+														helperText={
+															errors.returnDate ? errors.returnDate.message : ""
+														}
+														onChange={handleDateChange}
+														value={watch("returnDate")}
+													/>
+												</div>
+												<div className="flex-1">
+													<div className="mb-1 block">
+														<Label htmlFor="testedBy" value="Tested By" />
+													</div>
+													<TextInput
+														{...register("testedBy")}
+														id="testedBy"
+														name="testedBy"
+														type="text"
+														placeholder="e.g. Kien Jayjan Peralta"
+														color={`${errors.testedBy ? "failure" : "gray"}`}
+														helperText={
+															errors.testedBy ? errors.testedBy.message : ""
+														}
+													/>
+												</div>
 											</div>
 										</div>
 									)}
@@ -300,38 +362,6 @@ const BorrowItemForm = ({ data }) => {
 											Item Not found.
 										</p>
 									)}
-									<div>
-										<div className="mb-1 block">
-											<Label htmlFor="returnDate" value="Return Date" />
-										</div>
-										<TextInput
-											{...register("returnDate")}
-											id="returnDate"
-											type="datetime-local"
-											color={`${errors.returnDate ? "failure" : "gray"}`}
-											helperText={
-												errors.returnDate ? errors.returnDate.message : ""
-											}
-											onChange={handleDateChange}
-											value={watch("returnDate")}
-										/>
-									</div>
-									<div>
-										<div className="mb-1 block">
-											<Label htmlFor="testedBy" value="Tested By" />
-										</div>
-										<TextInput
-											{...register("testedBy")}
-											id="testedBy"
-											name="testedBy"
-											type="text"
-											placeholder="e.g. Kien Jayjan Peralta"
-											color={`${errors.testedBy ? "failure" : "gray"}`}
-											helperText={
-												errors.testedBy ? errors.testedBy.message : ""
-											}
-										/>
-									</div>
 								</div>
 								<div className="flex gap-2 w-full">
 									<Button

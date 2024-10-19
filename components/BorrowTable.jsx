@@ -1,21 +1,31 @@
 "use client";
 import { Table, Tooltip } from "flowbite-react";
 import { useFetchBorrowedItems } from "../hooks/useBorrowItem";
-import { format } from "date-fns";
 import Link from "next/link";
+import {
+	useGetTransactionsByCategory,
+	useDeleteTransaction,
+} from "../hooks/useTransactions";
 import { GrFormView } from "react-icons/gr";
 import { MdDelete } from "react-icons/md";
+import toast from "react-hot-toast";
+import { format } from "date-fns";
 
 const BorrowTable = () => {
-	const {
-		data: borrowedItems,
-		isError: isFetchItemsError,
-		isLoading: isItemFetching,
-	} = useFetchBorrowedItems();
+	const { mutateAsync: deleteTransaction } = useDeleteTransaction();
 
-	if (borrowedItems && !isItemFetching) {
-		console.log(borrowedItems);
-	}
+	const { data: transactions, isLoading: isTransactionFetching } =
+		useGetTransactionsByCategory("items");
+
+	console.log(transactions);
+
+	const handleDelete = async (id) => {
+		await toast.promise(deleteTransaction(id), {
+			success: "Transaction deleted successfully",
+			loading: "Deleting transaction...",
+			error: "Failed to delete transaction",
+		});
+	};
 
 	return (
 		<div className="overflow-x-auto shadow-sm">
@@ -29,28 +39,32 @@ const BorrowTable = () => {
 					<Table.HeadCell>Actions</Table.HeadCell>
 				</Table.Head>
 				<Table.Body className="divide-y">
-					{borrowedItems &&
-						!isItemFetching &&
-						borrowedItems.borrowedItems.map((item) => (
+					{transactions &&
+						!isTransactionFetching &&
+						transactions.map((item) => (
 							<Table.Row
 								key={item.id}
 								className="bg-white dark:border-gray-700 dark:bg-gray-800"
 							>
 								<Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-									{item.Borrower.name}
+									{item.recipient.name}
 								</Table.Cell>
-								<Table.Cell>{item.Borrower.email}</Table.Cell>
-								<Table.Cell>{item.Item?.name || "-"}</Table.Cell>
-								<Table.Cell>09/15/24</Table.Cell>
-								<Table.Cell>{item?.status}</Table.Cell>
+								<Table.Cell>{item.recipient.email}</Table.Cell>
+								<Table.Cell>{item.item?.name || "-"}</Table.Cell>
+								<Table.Cell>
+									{format(new Date(item.start_date), "MM/dd/yy")}
+								</Table.Cell>
+								<Table.Cell className="capitalize">
+									{item?.item.status}
+								</Table.Cell>
 								<Table.Cell className="flex gap-2">
 									<Tooltip content="View">
-										<Link href={`/borrow/${item?.item_id}`}>
+										<Link href={`/borrow/${item?.id}`}>
 											<GrFormView size={23} className="text-blue-500" />
 										</Link>
 									</Tooltip>
 									<Tooltip content="Delete">
-										<button>
+										<button onClick={() => handleDelete(item?.id)}>
 											<MdDelete size={23} className="text-red-500" />
 										</button>
 									</Tooltip>

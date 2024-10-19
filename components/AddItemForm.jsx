@@ -21,6 +21,7 @@ import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { categoriesList } from "../lib/categories";
+import { FaPlus } from "react-icons/fa";
 
 const AddItemForm = ({
 	data,
@@ -129,7 +130,11 @@ const AddItemForm = ({
 
 	return (
 		<>
-			<button className={`${className}`} onClick={() => setOpenModal(true)}>
+			<button
+				className={`${className} flex items-center gap-2`}
+				onClick={() => setOpenModal(true)}
+			>
+				{type === "add" && <FaPlus />}
 				{btnTitle}
 			</button>
 			<Modal

@@ -81,6 +81,7 @@ const Items = () => {
 						<Table.Head>
 							<Table.HeadCell>Item name</Table.HeadCell>
 							<Table.HeadCell>Category</Table.HeadCell>
+							<Table.HeadCell>Quantity</Table.HeadCell>
 							<Table.HeadCell>Unit</Table.HeadCell>
 							<Table.HeadCell>Condition</Table.HeadCell>
 							<Table.HeadCell>Barcode</Table.HeadCell>
@@ -103,6 +104,7 @@ const Items = () => {
 											</Tooltip>
 										</Table.Cell>
 										<Table.Cell>{categoriesList[item.category]}</Table.Cell>
+										<Table.Cell>{item.quantity}</Table.Cell>
 										<Table.Cell>{item.unit}</Table.Cell>
 										<Table.Cell className="w-[20px] text-center">
 											<Badge

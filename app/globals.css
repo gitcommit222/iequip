@@ -23,6 +23,11 @@
 }
 
 @layer utilities {
+	.hide-arrows::-webkit-outer-spin-button,
+	.hide-arrows::-webkit-inner-spin-button {
+		@apply appearance-none;
+	}
+
 	.hide-scrollbar::-webkit-scrollbar {
 		display: none;
 	}
