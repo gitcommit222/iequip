@@ -7,7 +7,7 @@ export const navLinks = [
 	{
 		label: "Supplies",
 		url: "/supplies",
-		icon: "/icons/goods.png",
+		icon: "/icons/product.png",
 	},
 	{
 		label: "Borrow",

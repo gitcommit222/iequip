@@ -42,7 +42,7 @@ export const useUser = () => {
 
 const logoutUser = async () => {
 	const response = await api.post("/users/logout");
-
+	localStorage.removeItem("accessToken");
 	return response.data;
 };
 

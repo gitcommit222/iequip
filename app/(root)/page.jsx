@@ -5,13 +5,20 @@ import InfoBox from "../../components/InfoBox";
 import BarChart from "../../components/BarChart";
 import PieChart from "../../components/PieChart";
 import { useGetItems } from "../../hooks/useItem";
+import { useFetchBorrowedItems } from "../../hooks/useBorrowItem";
 import NotifDrawer from "../../components/NotifDrawer";
 import { borrowedItem, item, lostItem, returnedItem } from "../../public";
 
 const Home = () => {
 	const { data: items, isLoading } = useGetItems();
+	const { data: borrowItems, isLoading: isBorrowItemsLoading } =
+		useFetchBorrowedItems();
 
 	const totalItems = items && items?.items?.length;
+	const totalBorrowedItems = borrowItems && borrowItems?.borrowedItems?.length;
+
+	console.log(borrowItems);
+
 	return (
 		<section>
 			<div className="flex items-center justify-between">
@@ -29,10 +36,14 @@ const Home = () => {
 				<div className="flex gap-4 flex-wrap">
 					<InfoBox
 						title="Total Items"
-						data={isLoading ? "..." : totalItems}
+						data={isLoading ? "..." : totalItems || 0}
 						iconUrl={item}
 					/>
-					<InfoBox title="Borrowed Items" data={25} iconUrl={borrowedItem} />
+					<InfoBox
+						title="Borrowed Items"
+						data={isBorrowItemsLoading ? "..." : totalBorrowedItems || 0}
+						iconUrl={borrowedItem}
+					/>
 					<InfoBox title="Returned Items" data={13} iconUrl={returnedItem} />
 					<InfoBox title="Lost Items" data={4} iconUrl={lostItem} />
 				</div>
