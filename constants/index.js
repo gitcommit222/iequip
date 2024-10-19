@@ -5,9 +5,9 @@ export const navLinks = [
 		icon: "/icons/gauge-solid.svg",
 	},
 	{
-		label: "Consumables",
-		url: "/consumables",
-		icon: "/icons/handshake-angle-solid.svg",
+		label: "Supplies",
+		url: "/supplies",
+		icon: "/icons/goods.png",
 	},
 	{
 		label: "Borrow",

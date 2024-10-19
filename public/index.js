@@ -10,6 +10,8 @@ import returnedItem from "./icons/returns.png";
 import lostItem from "./icons/business.png";
 import border from "./images/border.png";
 
+import goods from "./icons/goods.png";
+
 export {
 	logo,
 	signout,
@@ -21,4 +23,5 @@ export {
 	returnedItem,
 	lostItem,
 	border,
+	goods,
 };
