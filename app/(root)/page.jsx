@@ -12,11 +12,12 @@ import { useGetTransactionsByCategory } from "../../hooks/useTransactions";
 
 const Home = () => {
 	const { data: items, isLoading } = useGetItems();
-	const { data: transactions, isLoading: isBorrowItemsLoading } =
-		useGetTransactionsByCategory("items");
 
 	const totalItems = items && items?.items?.length;
-	const totalBorrowedItems = transactions && transactions?.length;
+
+	const totalBorrowedItems = items?.items?.filter(
+		(item) => item.status === "borrowed"
+	).length;
 
 	return (
 		<section>
@@ -40,7 +41,7 @@ const Home = () => {
 					/>
 					<InfoBox
 						title="Borrowed Items"
-						data={isBorrowItemsLoading ? "..." : totalBorrowedItems || 0}
+						data={isLoading ? "..." : totalBorrowedItems || 0}
 						iconUrl={borrowedItem}
 					/>
 					<InfoBox title="Returned Items" data={13} iconUrl={returnedItem} />

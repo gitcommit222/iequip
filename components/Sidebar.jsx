@@ -12,37 +12,18 @@ const Sidebar = () => {
 	const pathname = usePathname();
 
 	const {
-		mutateAsync: logout,
+		mutate: logout,
 		isPending: isLogoutPending,
 		isSuccess: isLogoutSuccess,
 	} = useLogout();
 
 	const router = useRouter();
 
-	useEffect(() => {
-		let toastId;
-
-		if (isLogoutPending) {
-			toastId = toast.loading("Logging out...");
-		}
-
-		if (isLogoutSuccess) {
-			toast.success("Logged out successfully");
-			router.push("/sign-in");
-		}
-
-		return () => {
-			// Clean up: Dismiss the toast if the component unmounts or process ends unexpectedly
-			if (toastId) {
-				toast.dismiss(toastId);
-			}
-		};
-	}, [isLogoutSuccess, isLogoutPending, router]);
-
-	const handleLogout = async () => {
+	const handleLogout = () => {
 		try {
 			console.log("Logout button clicked");
-			await logout();
+			logout();
+			router.push("/sign-in");
 		} catch (error) {
 			console.error("Logout error:", error);
 			toast.error("Logout failed. Please try again.");

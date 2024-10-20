@@ -9,6 +9,7 @@ import borrowedItem from "./icons/item.png";
 import returnedItem from "./icons/returns.png";
 import lostItem from "./icons/business.png";
 import border from "./images/border.png";
+import fallback from "./images/fallback.jpg";
 
 import goods from "./icons/goods.png";
 
@@ -24,4 +25,5 @@ export {
 	lostItem,
 	border,
 	goods,
+	fallback,
 };

@@ -19,6 +19,31 @@ export const useCreateTransaction = () => {
 	});
 };
 
+const returnBorrowedItems = async ({
+	transactionId,
+	returnedCondition,
+	returnedQuantity,
+	remarks,
+}) => {
+	const response = await api.post("/transactions/return", {
+		transactionId,
+		returnedCondition,
+		returnedQuantity,
+		remarks,
+	});
+	return response.data;
+};
+
+export const useReturnBorrowedItems = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: returnBorrowedItems,
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["transactions"] });
+		},
+	});
+};
+
 const getTransactions = async () => {
 	const response = await api.get("/transactions");
 	return response.data;
@@ -41,6 +66,19 @@ export const useGetTransactionsByCategory = (category) => {
 		queryKey: ["transactions", category],
 		queryFn: () => getTransactionsByCategory(category),
 		enabled: !!category,
+	});
+};
+
+const getTransactionById = async (transactionId) => {
+	const response = await api.get(`/transactions/id/${transactionId}`);
+	return response.data;
+};
+
+export const useGetTransactionById = (transactionId) => {
+	return useQuery({
+		queryKey: ["transaction", transactionId],
+		queryFn: () => getTransactionById(transactionId),
+		enabled: !!transactionId,
 	});
 };
 
