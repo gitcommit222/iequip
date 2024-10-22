@@ -154,14 +154,14 @@ const BorrowTable = () => {
 												<GrFormView size={23} className="text-blue-500" />
 											</Link>
 										</Tooltip>
-										<Tooltip content="Delete">
-											<button onClick={() => handleDelete(item?.id)}>
-												<MdDelete size={21} className="text-red-500" />
-											</button>
-										</Tooltip>
 										<Tooltip content="Download Receipt">
 											<button onClick={() => generateAndDownloadReceipt(item)}>
 												<FaFileDownload size={19} className="text-green-500" />
+											</button>
+										</Tooltip>
+										<Tooltip content="Delete">
+											<button onClick={() => handleDelete(item?.id)}>
+												<MdDelete size={21} className="text-red-500" />
 											</button>
 										</Tooltip>
 									</Table.Cell>
