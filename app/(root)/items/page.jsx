@@ -197,7 +197,9 @@ const Items = () => {
 							filteredAndSortedItems.map((item) => (
 								<Table.Row
 									key={item?.id}
-									className="bg-white dark:border-gray-700 dark:bg-gray-800"
+									className={`bg-white dark:border-gray-700 dark:bg-gray-800 ${
+										item.quantity === 0 ? "opacity-50 pointer-events-none" : ""
+									}`}
 								>
 									<Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
 										<Tooltip content={item.name}>
@@ -205,7 +207,9 @@ const Items = () => {
 										</Tooltip>
 									</Table.Cell>
 									<Table.Cell>{categoriesList[item.category]}</Table.Cell>
-									<Table.Cell>{item.quantity}</Table.Cell>
+									<Table.Cell>
+										{item.quantity > 0 ? item.quantity : "Out of Stock"}
+									</Table.Cell>
 									<Table.Cell>{item.unit}</Table.Cell>
 									<Table.Cell className="w-[20px] text-center">
 										<Badge
