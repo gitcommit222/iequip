@@ -144,9 +144,7 @@ const BorrowTable = () => {
 										{format(new Date(item.start_date), "MM/dd/yy")}
 									</Table.Cell>
 									<Table.Cell className="capitalize">
-										{item?.item.status === "available" && "Returned"}
-										{item?.item.status === "lost" && "Lost"}
-										{item?.item.status === "borrowed" && "Borrowed"}
+										{item?.t_status}
 									</Table.Cell>
 									<Table.Cell className="flex items-center gap-2">
 										<Tooltip content="View">

@@ -69,6 +69,18 @@ const AddItemForm = ({
 		resolver: yupResolver(addItemFormSchema),
 	});
 
+	// Add this useEffect hook to update form values when data changes
+	useEffect(() => {
+		if (data) {
+			setValue("itemName", data.name);
+			setValue("category", data.category);
+			setValue("quantity", data.quantity);
+			setValue("unit", data.unit);
+			setValue("itemCondition", data.item_condition);
+			setValue("file", data.image_path);
+		}
+	}, [data, setValue]);
+
 	const onSubmit = async (data) => {
 		const { itemName, category, quantity, unit, itemCondition, file } = data;
 		console.log("!!!UNIT: " + unit);

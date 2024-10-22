@@ -145,8 +145,7 @@ const BorrowedItemPage = ({ params }) => {
 									className="w-full text-sm"
 									size="sm"
 									disabled={
-										isReturnItemPending ||
-										borrowedItem?.item?.status === "available"
+										isReturnItemPending || borrowedItem?.t_status === "returned"
 									}
 								>
 									<option value="">Select condition</option>
