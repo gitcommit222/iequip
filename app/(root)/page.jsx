@@ -15,9 +15,12 @@ const Home = () => {
 
 	const totalItems = items && items?.items?.length;
 
-	const totalBorrowedItems = items?.items?.filter(
-		(item) => item.status === "borrowed"
-	).length;
+	const { data: transactions, isLoading: isTransactionsLoading } =
+		useGetTransactionsByCategory("items");
+
+	const totalBorrowedItems =
+		transactions &&
+		transactions?.filter((t) => t.t_status === "borrowed")?.length;
 
 	return (
 		<section>
@@ -41,7 +44,7 @@ const Home = () => {
 					/>
 					<InfoBox
 						title="Borrowed Items"
-						data={isLoading ? "..." : totalBorrowedItems || 0}
+						data={isTransactionsLoading ? "..." : totalBorrowedItems || 0}
 						iconUrl={borrowedItem}
 					/>
 					<InfoBox title="Returned Items" data={13} iconUrl={returnedItem} />

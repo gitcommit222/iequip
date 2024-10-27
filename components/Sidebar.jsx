@@ -57,7 +57,7 @@ const Sidebar = () => {
 											width={18}
 											height={18}
 											className={`${
-												isActive ? "brightness-0 invert" : "brightness-0"
+												isActive ? "brightness-0 invert" : "brightness-50"
 											}`}
 										/>
 										{item.label}

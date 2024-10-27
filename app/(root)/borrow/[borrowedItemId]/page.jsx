@@ -31,10 +31,13 @@ const BorrowedItemPage = ({ params }) => {
 		useGetTransactionById(parseInt(bItemId));
 
 	const [newCondition, setNewCondition] = useState("");
-	const [returnedQuantity, setReturnedQuantity] = useState(
-		borrowedItem?.borrowed_quantity || 1
-	);
+	const [returnedQuantity, setReturnedQuantity] = useState(1);
 	const [remarks, setRemarks] = useState("");
+
+	useEffect(() => {
+		setNewCondition(borrowedItem?.item?.item_condition || "");
+		setReturnedQuantity(borrowedItem?.borrowed_quantity || 1);
+	}, [borrowedItem]);
 
 	const router = useRouter();
 
@@ -172,7 +175,9 @@ const BorrowedItemPage = ({ params }) => {
 									max={borrowedItem?.borrowedItem?.quantity || 1}
 									className="w-full text-sm"
 									size="sm"
-									disabled={borrowedItem?.item?.status === "available"}
+									disabled={
+										isReturnItemPending || borrowedItem?.t_status === "returned"
+									}
 								/>
 							</div>
 
@@ -189,7 +194,9 @@ const BorrowedItemPage = ({ params }) => {
 									rows={3}
 									className="w-full text-sm"
 									placeholder="Add any additional notes or remarks about the returned item"
-									disabled={borrowedItem?.item?.status === "available"}
+									disabled={
+										isReturnItemPending || borrowedItem?.t_status === "returned"
+									}
 								/>
 							</div>
 
@@ -198,12 +205,11 @@ const BorrowedItemPage = ({ params }) => {
 								size="sm"
 								onClick={handleReturnItem}
 								disabled={
-									isReturnItemPending ||
-									borrowedItem?.item?.status === "available"
+									isReturnItemPending || borrowedItem?.t_status === "returned"
 								}
 								className="w-full mt-2"
 							>
-								{borrowedItem?.item?.status === "available"
+								{borrowedItem?.t_status === "returned"
 									? "Returned"
 									: "Set as Returned"}
 							</Button>

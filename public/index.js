@@ -10,6 +10,7 @@ import returnedItem from "./icons/returns.png";
 import lostItem from "./icons/business.png";
 import border from "./images/border.png";
 import fallback from "./images/fallback.jpg";
+import users from "./icons/group.png";
 
 import goods from "./icons/goods.png";
 
@@ -26,4 +27,5 @@ export {
 	border,
 	goods,
 	fallback,
+	users,
 };
