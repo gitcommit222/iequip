@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useMemo } from "react";
 import { Bar } from "react-chartjs-2";
 import {
 	Chart as ChartJS,
@@ -9,10 +9,33 @@ import {
 	Tooltip,
 	Legend,
 } from "chart.js";
+import { useGetTransactionsByCategory } from "../hooks/useTransactions";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 const BarChart = () => {
+	const { data: transactions } = useGetTransactionsByCategory("items");
+
+	const monthlyData = useMemo(() => {
+		if (!transactions) return {};
+
+		// Group transactions by item name
+		const itemTransactions = {};
+
+		transactions.forEach((transaction) => {
+			if (transaction.t_status === "borrowed") {
+				const itemName = transaction.item?.name || "Unknown Item";
+				if (!itemTransactions[itemName]) {
+					itemTransactions[itemName] = Array(12).fill(0);
+				}
+				const month = new Date(transaction.start_date).getMonth();
+				itemTransactions[itemName][month] += transaction.borrowed_quantity;
+			}
+		});
+
+		return itemTransactions;
+	}, [transactions]);
+
 	const barData = {
 		labels: [
 			"January",
@@ -28,15 +51,15 @@ const BarChart = () => {
 			"November",
 			"December",
 		],
-		datasets: [
-			{
-				label: "Borrowed Items",
-				data: [12, 19, 3, 5, 2, 3, 9, 6, 4, 8, 15, 7],
-				backgroundColor: "rgba(53, 162, 235, 0.5)",
-				borderColor: "rgb(53, 162, 235)",
+		datasets: Object.entries(monthlyData).map(
+			([itemName, quantities], index) => ({
+				label: itemName,
+				data: quantities,
+				backgroundColor: `hsla(${index * 37}, 70%, 50%, 0.5)`,
+				borderColor: `hsla(${index * 37}, 70%, 50%, 1)`,
 				borderWidth: 1,
-			},
-		],
+			})
+		),
 	};
 
 	const barOptions = {
@@ -45,12 +68,18 @@ const BarChart = () => {
 		plugins: {
 			legend: {
 				position: "top",
+				display: true,
 			},
 			title: {
 				display: true,
-				text: "Monthly Borrowed Items",
-				font: {
-					size: 16,
+				text: "Monthly Borrowed Items Analysis",
+				font: { size: 16 },
+			},
+			tooltip: {
+				callbacks: {
+					label: (context) => {
+						return `${context.dataset.label}: ${context.parsed.y} units`;
+					},
 				},
 			},
 		},
@@ -59,14 +88,16 @@ const BarChart = () => {
 				beginAtZero: true,
 				title: {
 					display: true,
-					text: "Number of Items",
+					text: "Number of Items Borrowed",
 				},
+				stacked: true,
 			},
 			x: {
 				title: {
 					display: true,
 					text: "Month",
 				},
+				stacked: true,
 			},
 		},
 	};

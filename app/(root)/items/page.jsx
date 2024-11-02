@@ -170,7 +170,7 @@ const Items = () => {
 					Export to Excel
 				</Button>
 			</div>
-			<div className="overflow-x-auto shadow-sm min-h-[500px]">
+			<div className="overflow-x-auto  min-h-[500px]">
 				<Table>
 					<Table.Head>
 						<Table.HeadCell onClick={() => handleSort("name")}>

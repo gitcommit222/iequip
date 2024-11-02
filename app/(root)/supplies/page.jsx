@@ -146,8 +146,8 @@ const Supplies = () => {
 					Export to Excel
 				</Button>
 			</div>
-			<div className="overflow-x-auto shadow-sm min-h-[500px]">
-				<Table>
+			<div className="bg-white rounded-lg shadow-sm overflow-x-auto">
+				<Table hoverable>
 					<Table.Head>
 						<Table.HeadCell>Select</Table.HeadCell>
 						<Table.HeadCell onClick={() => handleSort("item_name")}>
@@ -168,9 +168,6 @@ const Supplies = () => {
 						<Table.HeadCell onClick={() => handleSort("unit")}>
 							Unit
 						</Table.HeadCell>
-						<Table.HeadCell onClick={() => handleSort("category")}>
-							Category
-						</Table.HeadCell>
 						<Table.HeadCell onClick={() => handleSort("remarks")}>
 							Remarks
 						</Table.HeadCell>
@@ -178,8 +175,8 @@ const Supplies = () => {
 					</Table.Head>
 					<Table.Body className="divide-y">
 						{!isGoodsLoading &&
-							filteredAndSortedGoods.map((item) => (
-								<Table.Row
+							filteredAndSortedGoods.map((item, index) => (
+								<tr
 									key={item?.id}
 									className={`bg-white dark:border-gray-700 dark:bg-gray-800 ${
 										item.quantity_available === 0
@@ -204,7 +201,6 @@ const Supplies = () => {
 									<Table.Cell>{item.quantity_available}</Table.Cell>
 									<Table.Cell>{item.quantity_distributed}</Table.Cell>
 									<Table.Cell>{item.unit}</Table.Cell>
-									<Table.Cell>{item.category}</Table.Cell>
 									<Table.Cell>{truncateText(item.remarks, 20)}</Table.Cell>
 									<Table.Cell className="flex gap-2">
 										<AddSupplyForm
@@ -243,7 +239,7 @@ const Supplies = () => {
 											}
 										/>
 									</Table.Cell>
-								</Table.Row>
+								</tr>
 							))}
 					</Table.Body>
 				</Table>

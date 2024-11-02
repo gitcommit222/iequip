@@ -9,25 +9,34 @@ import { useFetchBorrowedItems } from "../../hooks/useBorrowItem";
 import NotifDrawer from "../../components/NotifDrawer";
 import { borrowedItem, item, lostItem, returnedItem } from "../../public";
 import { useGetTransactionsByCategory } from "../../hooks/useTransactions";
+import { useUser } from "../../hooks/useAuth";
 
 const Home = () => {
 	const { data: items, isLoading } = useGetItems();
 
 	const totalItems = items && items?.items?.length;
 
+	const { data: currentUser } = useUser();
+
 	const { data: transactions, isLoading: isTransactionsLoading } =
 		useGetTransactionsByCategory("items");
+
+	const totalLostItems =
+		transactions && transactions?.filter((t) => t.t_status === "lost")?.length;
 
 	const totalBorrowedItems =
 		transactions &&
 		transactions?.filter((t) => t.t_status === "borrowed")?.length;
 
+	const totalReturnedItems =
+		transactions &&
+		transactions?.filter((t) => t.t_status === "returned")?.length;
+
 	return (
 		<section>
 			<div className="flex items-center justify-between">
 				<HeaderBox
-					title="Hello,"
-					user="User"
+					title={`Hello, ${currentUser?.fetchedUser?.name || "User"}`}
 					type="greeting"
 					subtext="Track your data progress here."
 				/>
@@ -47,8 +56,16 @@ const Home = () => {
 						data={isTransactionsLoading ? "..." : totalBorrowedItems || 0}
 						iconUrl={borrowedItem}
 					/>
-					<InfoBox title="Returned Items" data={13} iconUrl={returnedItem} />
-					<InfoBox title="Lost Items" data={4} iconUrl={lostItem} />
+					<InfoBox
+						title="Returned Items"
+						data={isTransactionsLoading ? "..." : totalReturnedItems || 0}
+						iconUrl={returnedItem}
+					/>
+					<InfoBox
+						title="Lost Items"
+						data={isTransactionsLoading ? "..." : totalLostItems || 0}
+						iconUrl={lostItem}
+					/>
 				</div>
 				<div className="flex flex-wrap items-center justify-center gap-3">
 					<div className="flex-1">
