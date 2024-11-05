@@ -19,7 +19,10 @@ export const useLogin = () => {
 
 	return useMutation({
 		mutationFn: loginUser,
-		onSuccess: (data) => queryClient.setQueryData(["user"], data.user),
+		onSuccess: (data) => {
+			console.log(data.user);
+			queryClient.setQueryData(["user"], data.user);
+		},
 		onError: () => {},
 	});
 };
