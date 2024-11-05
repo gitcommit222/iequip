@@ -11,6 +11,8 @@ export default function NotifDrawer({ color = "gray" }) {
 
 	const { data: notifs } = useGetNotifications();
 
+	console.log(notifs);
+
 	const { mutateAsync: deleteNotif } = useDeleteNotif();
 
 	const handleClose = () => setIsOpenDrawer(false);
@@ -36,7 +38,7 @@ export default function NotifDrawer({ color = "gray" }) {
 				<Drawer.Header title="Notifications" titleIcon={GoBell} />
 				<div className="flex gap-2 flex-col">
 					{notifs &&
-						notifs.map((notif) => (
+						notifs.notification?.map((notif) => (
 							<Drawer.Items className="border p-3 rounded-md" key={notif.id}>
 								<div className="flex justify-between">
 									<h1 className="font-semibold text-[14px] text-gray-700">
