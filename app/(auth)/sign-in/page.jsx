@@ -65,7 +65,7 @@ const SignIn = () => {
 			<div className="flex flex-col items-center border-b-2 border-b-gray-300">
 				<Image src={logo} alt="logo" height={150} width={200} />
 				<p className="text-[15px] text-gray-500 font-Montserrat mb-5">
-					Welcome to GearKeeper - Please login to your account
+					Welcome to I-Equip - Please login to your account
 				</p>
 			</div>
 			<div>
