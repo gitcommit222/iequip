@@ -56,6 +56,8 @@ const AddItemForm = ({
 		reset,
 		setError,
 		setValue,
+		getValues,
+		trigger,
 		formState: { errors, isSubmitting },
 	} = useForm({
 		defaultValues: {
@@ -63,7 +65,6 @@ const AddItemForm = ({
 			category: data ? data.category : 0,
 			quantity: data ? data.quantity : 1,
 			unit: data ? data.unit : "",
-			itemCondition: data ? data.item_condition : "",
 			file: data ? data.image_path : "",
 		},
 		resolver: yupResolver(addItemFormSchema),
@@ -76,13 +77,20 @@ const AddItemForm = ({
 			setValue("category", data.category);
 			setValue("quantity", data.quantity);
 			setValue("unit", data.unit);
-			setValue("itemCondition", data.item_condition);
 			setValue("file", data.image_path);
 		}
 	}, [data, setValue]);
 
 	const onSubmit = async (data) => {
-		const { itemName, category, quantity, unit, itemCondition, file } = data;
+		const {
+			itemName,
+			category,
+			quantity,
+			unit,
+			itemCondition,
+			file,
+			damagedItemQty,
+		} = data;
 		console.log("!!!UNIT: " + unit);
 
 		try {
@@ -97,7 +105,7 @@ const AddItemForm = ({
 				quantity,
 				barcode,
 				unit,
-				item_condition: itemCondition,
+				item_condition: "Good",
 			};
 
 			if (!file) {
@@ -139,6 +147,12 @@ const AddItemForm = ({
 			});
 		}
 	};
+
+	const condition = getValues("itemCondition");
+
+	useEffect(() => {
+		if (condition !== "Good") trigger("itemCondition");
+	}, [condition]);
 
 	return (
 		<>
@@ -187,25 +201,6 @@ const AddItemForm = ({
 											{cat}
 										</option>
 									))}
-								</Select>
-							</div>
-							<div className="max-w-[180px] w-[180px]">
-								<div className="mb-2 block">
-									<Label htmlFor="itemCondition" value="Condition" />
-								</div>
-								<Select
-									{...register("itemCondition")}
-									id="itemCondition"
-									name="itemCondition"
-									color={`${errors.itemCondition ? "failure" : "gray"}`}
-									helperText={
-										errors.itemCondition ? errors.itemCondition.message : ""
-									}
-								>
-									<option value="" disabled></option>
-									<option value="Good">Good</option>
-									<option value="Slightly Damaged">Slightly Damaged</option>
-									<option value="Damaged">Damaged</option>
 								</Select>
 							</div>
 						</div>

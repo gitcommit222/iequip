@@ -212,20 +212,9 @@ const Items = () => {
 									</Table.Cell>
 									<Table.Cell>{item.unit}</Table.Cell>
 									<Table.Cell className="w-[20px] text-center">
-										<Badge
-											color={
-												item.item_condition == "Good"
-													? "success"
-													: item.item_condition == "Slightly Damaged"
-													? "warning"
-													: "failure"
-											}
-											className="text-[12px] text-nowrap"
-										>
+										<Badge color="success" className="text-[12px] text-nowrap">
 											<Tooltip content={item.item_condition}>
-												<p className="text-center">
-													{truncateText(item.item_condition, 9)}
-												</p>
+												<p className="text-center">GOOD</p>
 											</Tooltip>
 										</Badge>
 									</Table.Cell>

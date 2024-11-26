@@ -81,7 +81,6 @@ const BorrowedItemPage = ({ params }) => {
 				<p className="mb-6 text-gray-600">
 					Please review the item details and return if ready.
 				</p>
-
 				<div className="flex flex-col lg:flex-row justify-between gap-8">
 					<div className="flex-1">
 						<h3 className="text-xl font-semibold mb-3">Borrower details</h3>
@@ -137,29 +136,6 @@ const BorrowedItemPage = ({ params }) => {
 						<div className="space-y-3">
 							<div>
 								<Label
-									htmlFor="condition"
-									value="Item Condition"
-									className="mb-1 block text-sm"
-								/>
-								<Select
-									id="condition"
-									onChange={(e) => setNewCondition(e.target.value)}
-									value={newCondition}
-									className="w-full text-sm"
-									size="sm"
-									disabled={
-										isReturnItemPending || borrowedItem?.t_status === "returned"
-									}
-								>
-									<option value="">Select condition</option>
-									<option value="Good">Good</option>
-									<option value="Slightly Damaged">Slightly Damaged</option>
-									<option value="Damaged">Damaged</option>
-								</Select>
-							</div>
-
-							<div>
-								<Label
 									htmlFor="quantity"
 									value="Returned Quantity"
 									className="mb-1 block text-sm"
@@ -172,7 +148,7 @@ const BorrowedItemPage = ({ params }) => {
 										setReturnedQuantity(parseInt(e.target.value))
 									}
 									min={1}
-									max={borrowedItem?.borrowedItem?.quantity || 1}
+									max={borrowedItem?.borrowed_quantity || 1}
 									className="w-full text-sm"
 									size="sm"
 									disabled={

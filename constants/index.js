@@ -15,13 +15,23 @@ export const navLinks = [
 		icon: "/icons/handshake-angle-solid.svg",
 	},
 	{
-		label: "Supplies",
+		label: "Supply Items",
 		url: "/supplies",
 		icon: "/icons/product.png",
+	},
+	{
+		label: "Supply Trans",
+		url: "/supply-transactions",
+		icon: "/icons/transactions.png",
 	},
 	{
 		label: "User",
 		url: "/user",
 		icon: "/icons/group.png",
+	},
+	{
+		label: "Guides",
+		url: "/guide",
+		icon: "/icons/info.png",
 	},
 ];
