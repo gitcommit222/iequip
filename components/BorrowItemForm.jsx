@@ -13,12 +13,17 @@ import { format, parseISO } from "date-fns"; // Add parseISO import
 
 import { categoriesList } from "../lib/categories";
 import { FaCircleExclamation } from "react-icons/fa6";
+import { BsUpcScan } from "react-icons/bs";
 
 import { FaCheckCircle, FaMinusCircle } from "react-icons/fa";
 import toast from "react-hot-toast";
 
+import { BarcodeScanner } from "react-barcode-scanner";
+import "react-barcode-scanner/polyfill";
+
 const BorrowItemForm = ({ data }) => {
 	const [openModal, setOpenModal] = useState(false);
+	const [openScanner, setOpenScanner] = useState(false);
 	const [barcode, setBarcode] = useState("");
 
 	const borrowItemMutation = useCreateTransaction();
@@ -230,7 +235,7 @@ const BorrowItemForm = ({ data }) => {
 										<div className="mb-1 block">
 											<Label htmlFor="itemBarcode" value="Item Barcode" />
 										</div>
-										<div className="flex gap-2">
+										<div className="flex gap-2 items-center">
 											<div className="flex-1">
 												<TextInput
 													{...register("itemBarcode")}
@@ -255,6 +260,27 @@ const BorrowItemForm = ({ data }) => {
 												>
 													Search
 												</Button>
+											</div>
+											<div>
+												<Button
+													color="success"
+													onClick={() => setOpenScanner(true)}
+												>
+													<BsUpcScan size={18} />
+												</Button>
+												<Modal
+													show={openScanner}
+													size="md"
+													onClose={() => setOpenScanner(false)}
+													popup
+												>
+													<Modal.Header />
+													<Modal.Body>
+														<div className="text-center">
+															<BarcodeScanner />
+														</div>
+													</Modal.Body>
+												</Modal>
 											</div>
 										</div>
 									</div>
