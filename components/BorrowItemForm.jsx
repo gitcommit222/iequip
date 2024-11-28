@@ -33,6 +33,7 @@ const BorrowItemForm = ({ data }) => {
 		reset,
 		setError,
 		control,
+		trigger,
 		watch,
 		setValue,
 		formState: { errors, isSubmitting },
@@ -111,6 +112,14 @@ const BorrowItemForm = ({ data }) => {
 			console.log("Modal opened, initializing scanner...");
 		}
 	}, [openScanner]);
+
+	const handleOnScanned = (result) => {
+		if (result) {
+			setBarcode(result);
+			setValue("itemBarcode", barcode);
+			setOpenScanner(false);
+		}
+	};
 
 	return (
 		<>
@@ -247,7 +256,7 @@ const BorrowItemForm = ({ data }) => {
 													{...register("itemBarcode")}
 													id="itemBarcode"
 													type="text"
-													placeholder="e.g. ITE12312312"
+													placeholder={`${barcode || "e.g. ITE12312312"} `}
 													name="itemBarcode"
 													color={`${errors.itemBarcode ? "failure" : "gray"}`}
 													onChange={(e) => setBarcode(e.target.value)}
@@ -281,7 +290,7 @@ const BorrowItemForm = ({ data }) => {
 												>
 													<Modal.Header />
 													<Modal.Body>
-														<QRCodeScanner />
+														<QRCodeScanner onScanned={handleOnScanned} />
 													</Modal.Body>
 												</Modal>
 											</div>

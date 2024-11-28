@@ -18,19 +18,17 @@ const QRCodeScanner = ({ onScanned }) => {
 		});
 
 		const handleSuccess = async (result) => {
-			scanner.clear();
 			setScanResult(result);
+			if (onScanned) {
+				await onScanned(result);
+			}
+			scanner.clear();
 		};
 		const handleError = (err) => {};
 		scanner.render(handleSuccess, handleError);
 	}, []);
 
-	return (
-		<div>
-			<h1>Scan Bar code here:</h1>
-			{scanResult ? <div>{scanResult}</div> : <div id="reader"></div>}
-		</div>
-	);
+	return <div>{scanResult ? null : <div id="reader"></div>}</div>;
 };
 
-export default React.memo(QRCodeScanner);
+export default QRCodeScanner;
