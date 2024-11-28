@@ -18,8 +18,7 @@ import { BsUpcScan } from "react-icons/bs";
 import { FaCheckCircle, FaMinusCircle } from "react-icons/fa";
 import toast from "react-hot-toast";
 
-import { BarcodeScanner } from "react-barcode-scanner";
-import "react-barcode-scanner/polyfill";
+import QRCodeScanner from "../components/QRScanner";
 
 const BorrowItemForm = ({ data }) => {
 	const [openModal, setOpenModal] = useState(false);
@@ -105,6 +104,13 @@ const BorrowItemForm = ({ data }) => {
 		const newDate = e.target.value;
 		setValue("returnDate", newDate);
 	};
+
+	useEffect(() => {
+		// When the modal opens, we need to ensure that the scanner only initializes then.
+		if (openScanner) {
+			console.log("Modal opened, initializing scanner...");
+		}
+	}, [openScanner]);
 
 	return (
 		<>
@@ -250,7 +256,6 @@ const BorrowItemForm = ({ data }) => {
 													}
 												/>
 											</div>
-
 											<div>
 												<Button
 													onClick={() => {
@@ -276,9 +281,7 @@ const BorrowItemForm = ({ data }) => {
 												>
 													<Modal.Header />
 													<Modal.Body>
-														<div className="text-center">
-															<BarcodeScanner />
-														</div>
+														<QRCodeScanner />
 													</Modal.Body>
 												</Modal>
 											</div>
