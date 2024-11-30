@@ -19,11 +19,14 @@ import { FaCheckCircle, FaMinusCircle } from "react-icons/fa";
 import toast from "react-hot-toast";
 
 import QRCodeScanner from "../components/QRScanner";
+import { useUser } from "../hooks/useAuth";
 
 const BorrowItemForm = ({ data }) => {
 	const [openModal, setOpenModal] = useState(false);
 	const [openScanner, setOpenScanner] = useState(false);
 	const [barcode, setBarcode] = useState("");
+
+	const { data: user } = useUser();
 
 	const borrowItemMutation = useCreateTransaction();
 
@@ -47,7 +50,7 @@ const BorrowItemForm = ({ data }) => {
 			department: data?.department || "",
 			itemBarcode: data?.barcode || "",
 			itemQty: data?.quantity || 1,
-			testedBy: data?.testedBy || "",
+			testedBy: data?.testedBy || user?.fetchedUser?.name,
 			returnDate: data?.end_date
 				? format(parseISO(data.end_date), "yyyy-MM-dd'T'HH:mm")
 				: format(new Date(), "yyyy-MM-dd'T'HH:mm"),
@@ -115,7 +118,7 @@ const BorrowItemForm = ({ data }) => {
 
 	const handleOnScanned = (result) => {
 		if (result) {
-			setBarcode(result);
+			setBarcode(result.replace(/"/g, ""));
 			setValue("itemBarcode", barcode);
 			setOpenScanner(false);
 		}

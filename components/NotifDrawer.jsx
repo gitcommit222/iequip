@@ -11,8 +11,6 @@ export default function NotifDrawer({ color = "gray" }) {
 
 	const { data: notifs } = useGetNotifications();
 
-	console.log(notifs);
-
 	const { mutateAsync: deleteNotif } = useDeleteNotif();
 
 	const handleClose = () => setIsOpenDrawer(false);
@@ -24,6 +22,8 @@ export default function NotifDrawer({ color = "gray" }) {
 			error: "Failed to delete Notification",
 		});
 	};
+
+	console.log(notifs);
 
 	return (
 		<>
@@ -37,32 +37,34 @@ export default function NotifDrawer({ color = "gray" }) {
 			<Drawer open={isOpenDrawer} onClose={handleClose} position="right">
 				<Drawer.Header title="Notifications" titleIcon={GoBell} />
 				<div className="flex gap-2 flex-col">
-					{notifs &&
-						notifs.notification?.map((notif) => (
-							<Drawer.Items className="border p-3 rounded-md" key={notif.id}>
-								<div className="flex justify-between">
-									<h1 className="font-semibold text-[14px] text-gray-700">
-										{notif.Notification.title}
-									</h1>
-									<div className="flex gap-1">
-										<p className="text-[14px] text-gray-600">
-											<Badge color="info">New</Badge>
-										</p>
-										<button
-											className="text-red-500"
-											onClick={() => handleDeleteNotif(notif.id)}
-										>
-											<MdDelete />
-										</button>
-									</div>
-								</div>
-								<div className="mt-2">
-									<p className="text-[12px] text-gray-600">
-										{notif.Notification.message}
+					{notifs?.map((notif) => (
+						<Drawer.Items
+							className="border p-3 rounded-md"
+							key={notif.Notification.id}
+						>
+							<div className="flex justify-between">
+								<h1 className="font-semibold text-[14px] text-gray-700">
+									{notif.Notification.title}
+								</h1>
+								<div className="flex gap-1">
+									<p className="text-[14px] text-gray-600">
+										<Badge color="info">New</Badge>
 									</p>
+									<button
+										className="text-red-500"
+										onClick={() => handleDeleteNotif(notif.Notification.id)}
+									>
+										<MdDelete />
+									</button>
 								</div>
-							</Drawer.Items>
-						))}
+							</div>
+							<div className="mt-2">
+								<p className="text-[12px] text-gray-600">
+									{notif.Notification.message}
+								</p>
+							</div>
+						</Drawer.Items>
+					))}
 				</div>
 			</Drawer>
 		</>

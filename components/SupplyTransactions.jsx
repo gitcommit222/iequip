@@ -2,12 +2,14 @@
 import { Table, Tooltip } from "flowbite-react";
 import React from "react";
 import { MdDelete } from "react-icons/md";
+import { FaFileDownload } from "react-icons/fa";
 import {
 	useDeleteSupplyTransaction,
 	useGetSupplyTransactions,
 } from "../hooks/useSupplyTransactions";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
+import { generateSupplyDistributionReceipt } from "../lib/generateReceipt";
 
 const SupplyTransactions = () => {
 	const { data: distributed, isLoading: isDistributedItemLoading } =
@@ -57,6 +59,13 @@ const SupplyTransactions = () => {
 									{item?.released_by}
 								</Table.Cell>
 								<Table.Cell className="flex items-center gap-2">
+									<Tooltip content="Download Receipt">
+										<button
+											onClick={() => generateSupplyDistributionReceipt(item)}
+										>
+											<FaFileDownload size={19} className="text-green-500" />
+										</button>
+									</Tooltip>
 									<Tooltip content="Delete">
 										<button onClick={() => handleDelete(item?.id)}>
 											<MdDelete size={21} className="text-red-500" />

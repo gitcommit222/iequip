@@ -1,6 +1,5 @@
 "use client";
 import { useRef, useState, useMemo, useEffect } from "react";
-import Barcode from "react-barcode";
 import { toPng } from "html-to-image";
 import {
 	FaImage,
@@ -31,6 +30,7 @@ import { categoriesList } from "../../../lib/categories";
 import * as XLSX from "xlsx";
 import ItemImage from "../../../components/ItemImage";
 import Headerbox from "../../../components/shared/Headerbox";
+import QRCode, { QRCodeCanvas } from "qrcode.react";
 
 const Items = () => {
 	const barcodeRef = useRef();
@@ -58,11 +58,11 @@ const Items = () => {
 				.then((dataUrl) => {
 					const link = document.createElement("a");
 					link.href = dataUrl;
-					link.download = "barcode.png";
+					link.download = "QRCode.png";
 					link.click();
 				})
 				.catch((error) => {
-					console.error("Error converting barcode to image:", error);
+					console.error("Error converting QRCode to image:", error);
 				});
 		}
 	};
@@ -240,11 +240,11 @@ const Items = () => {
 												}
 												content={
 													<div className="p-3">
-														<div ref={barcodeRef}>
-															<Barcode
-																value={item.barcode}
-																width={1.3}
-																height={50}
+														<div ref={barcodeRef} className="bg-white p-4">
+															<QRCodeCanvas
+																value={JSON.stringify(item.barcode)}
+																renderAs="svg"
+																level="M"
 															/>
 														</div>
 													</div>
