@@ -1,5 +1,12 @@
 "use client";
-import { Button, Datepicker, Label, Modal, TextInput } from "flowbite-react";
+import {
+	Button,
+	Datepicker,
+	Label,
+	Modal,
+	Select,
+	TextInput,
+} from "flowbite-react";
 import { useEffect, useState } from "react";
 import { BorrowItemSchema } from "../lib/schema";
 import ItemImage from "../components/ItemImage";
@@ -13,7 +20,7 @@ import { format, parseISO } from "date-fns"; // Add parseISO import
 
 import { categoriesList } from "../lib/categories";
 import { FaCircleExclamation } from "react-icons/fa6";
-import { BsUpcScan } from "react-icons/bs";
+import { BiQrScan } from "react-icons/bi";
 
 import { FaCheckCircle, FaMinusCircle } from "react-icons/fa";
 import toast from "react-hot-toast";
@@ -124,6 +131,46 @@ const BorrowItemForm = ({ data }) => {
 		}
 	};
 
+	const departmentOptions = [
+		{ value: "PGO", label: "PGO (Provincial Governor's Office)" },
+		{ value: "GSO", label: "GSO (General Supplies Office)" },
+		{ value: "HRMO", label: "HRMO (Human Resource Management Office)" },
+		{ value: "PTO", label: "PTO (Provincial Treasurers Office)" },
+		{ value: "PACCO", label: "PACCO (Provincial Accounting Office)" },
+		{ value: "PASSO", label: "PASSO (Provincial Assesor Office)" },
+		{ value: "PEO", label: "PEO (Provincial Engineering Office)" },
+		{
+			value: "PPDO",
+			label: "PPDO (Provincial Planning and Development Office)",
+		},
+		{ value: "PEPO", label: "PEPO (Provincial Equipment Pool Office)" },
+		{
+			value: "PSWDO",
+			label: "PSWDO (Provincial Social Welfare and Development Office)",
+		},
+		{
+			value: "DICT",
+			label: "DICT (Department of Information and Communication Technology)",
+		},
+		{ value: "OPAD", label: "OPAD (Office of Provincial Administrator)" },
+		{ value: "PBO", label: "PBO (Provincial Budget Office)" },
+		{ value: "ENRO", label: "ENRO (Environment and Natural Resources Office)" },
+		{ value: "OPA", label: "OPA (Office of the Provincial Agriculturist)" },
+		{ value: "CSC", label: "CSC (Civil Service on Commission)" },
+		{ value: "COA", label: "COA (Commission On Audit)" },
+		{ value: "CONGRESS", label: "Office of The Congress" },
+		{ value: "LEGAL", label: "Legal Office" },
+		{
+			value: "DILG",
+			label: "DILG (Department of Interior and Local Government)",
+		},
+		{ value: "COMMELEC", label: "Provincial Commelec" },
+		{ value: "RTC", label: "Regional Trial Court" },
+		{ value: "MTC", label: "Municipal Trial Court" },
+		{ value: "FISCAL", label: "FISCAL" },
+		{ value: "DSWD", label: "DSWD (Department of Social Welfare Development)" },
+	];
+
 	return (
 		<>
 			<Button color="success" pill size="sm" onClick={() => setOpenModal(true)}>
@@ -229,22 +276,23 @@ const BorrowItemForm = ({ data }) => {
 									</div>
 									<div className="field-container">
 										<div className="mb-1 block">
-											<Label
-												htmlFor="department"
-												value="Department (Optional)"
-											/>
+											<Label htmlFor="department" value="Department" />
 										</div>
-										<TextInput
+										<Select
 											{...register("department")}
 											id="department"
 											name="department"
-											type="text"
-											placeholder="e.g. Provincial Governor's Office (PGO)"
-											color={`${errors.department ? "failure" : "gray"}`}
-											helperText={
-												errors.department ? errors.department.message : ""
-											}
-										/>
+											className={`rounded-lg w-full ${
+												errors.department ? "border-red-500" : "border-gray-300"
+											}`}
+										>
+											<option value="">Select Department</option>
+											{departmentOptions.map((dept) => (
+												<option key={dept.value} value={dept.value}>
+													{dept.label}
+												</option>
+											))}
+										</Select>
 									</div>
 								</div>
 								<div className="space-y-3 mb-5">
@@ -283,7 +331,7 @@ const BorrowItemForm = ({ data }) => {
 													color="success"
 													onClick={() => setOpenScanner(true)}
 												>
-													<BsUpcScan size={18} />
+													<BiQrScan size={18} />
 												</Button>
 												<Modal
 													show={openScanner}

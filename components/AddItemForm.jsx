@@ -230,6 +230,7 @@ const AddItemForm = ({
 								<TextInput
 									{...register("quantity")}
 									id="quantity"
+									disabled
 									name="quantity"
 									color={`${errors.quantity ? "failure" : "gray"}`}
 									helperText={errors.quantity ? errors.quantity.message : ""}

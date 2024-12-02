@@ -1,10 +1,11 @@
 import React from "react";
-import { Button, Modal, Label, TextInput } from "flowbite-react";
+import { Button, Modal, Label, TextInput, Select } from "flowbite-react";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { transactionSchema } from "../lib/schema";
 import ItemImage from "./ItemImage";
+import { useUser } from "../hooks/useAuth";
 
 const AddTransactionForm = ({
 	createSupplyTransaction,
@@ -12,6 +13,8 @@ const AddTransactionForm = ({
 	isOpen,
 	onClose,
 }) => {
+	const { data: user } = useUser();
+
 	const {
 		register,
 		handleSubmit,
@@ -27,7 +30,7 @@ const AddTransactionForm = ({
 			fullAddress: "",
 			department: "",
 			distribution_date: new Date().toISOString().split("T")[0],
-			released_by: "",
+			released_by: user?.fetchedUser.name || "",
 			remarks: "",
 			supply_quantities: supplies.map((supply) => ({
 				id: supply.id,
@@ -49,6 +52,46 @@ const AddTransactionForm = ({
 			console.error("Error creating transaction:", error);
 		}
 	};
+
+	const departmentOptions = [
+		{ value: "PGO", label: "PGO (Provincial Governor's Office)" },
+		{ value: "GSO", label: "GSO (General Supplies Office)" },
+		{ value: "HRMO", label: "HRMO (Human Resource Management Office)" },
+		{ value: "PTO", label: "PTO (Provincial Treasurers Office)" },
+		{ value: "PACCO", label: "PACCO (Provincial Accounting Office)" },
+		{ value: "PASSO", label: "PASSO (Provincial Assesor Office)" },
+		{ value: "PEO", label: "PEO (Provincial Engineering Office)" },
+		{
+			value: "PPDO",
+			label: "PPDO (Provincial Planning and Development Office)",
+		},
+		{ value: "PEPO", label: "PEPO (Provincial Equipment Pool Office)" },
+		{
+			value: "PSWDO",
+			label: "PSWDO (Provincial Social Welfare and Development Office)",
+		},
+		{
+			value: "DICT",
+			label: "DICT (Department of Information and Communication Technology)",
+		},
+		{ value: "OPAD", label: "OPAD (Office of Provincial Administrator)" },
+		{ value: "PBO", label: "PBO (Provincial Budget Office)" },
+		{ value: "ENRO", label: "ENRO (Environment and Natural Resources Office)" },
+		{ value: "OPA", label: "OPA (Office of the Provincial Agriculturist)" },
+		{ value: "CSC", label: "CSC (Civil Service on Commission)" },
+		{ value: "COA", label: "COA (Commission On Audit)" },
+		{ value: "CONGRESS", label: "Office of The Congress" },
+		{ value: "LEGAL", label: "Legal Office" },
+		{
+			value: "DILG",
+			label: "DILG (Department of Interior and Local Government)",
+		},
+		{ value: "COMMELEC", label: "Provincial Commelec" },
+		{ value: "RTC", label: "Regional Trial Court" },
+		{ value: "MTC", label: "Municipal Trial Court" },
+		{ value: "FISCAL", label: "FISCAL" },
+		{ value: "DSWD", label: "DSWD (Department of Social Welfare Development)" },
+	];
 
 	return (
 		<Modal show={isOpen} onClose={onClose} popup size="7xl">
@@ -125,15 +168,24 @@ const AddTransactionForm = ({
 									/>
 								</div>
 								<div className="field-container">
-									<Label htmlFor="department" value="Department (Optional)" />
-									<TextInput
+									<div className="mb-1 block">
+										<Label htmlFor="department" value="Department" />
+									</div>
+									<Select
 										{...register("department")}
 										id="department"
-										type="text"
-										placeholder="e.g. Provincial Governor's Office (PGO)"
-										color={errors.department ? "failure" : "gray"}
-										helperText={errors.department?.message}
-									/>
+										name="department"
+										className={`rounded-lg w-full ${
+											errors.department ? "border-red-500" : "border-gray-300"
+										}`}
+									>
+										<option value="">Select Department</option>
+										{departmentOptions.map((dept) => (
+											<option key={dept.value} value={dept.value}>
+												{dept.label}
+											</option>
+										))}
+									</Select>
 								</div>
 							</div>
 
@@ -159,6 +211,7 @@ const AddTransactionForm = ({
 										{...register("released_by")}
 										id="released_by"
 										type="text"
+										disabled
 										color={errors.released_by ? "failure" : "gray"}
 										helperText={errors.released_by?.message}
 									/>

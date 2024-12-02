@@ -188,7 +188,7 @@ const Items = () => {
 						<Table.HeadCell onClick={() => handleSort("item_condition")}>
 							Condition
 						</Table.HeadCell>
-						<Table.HeadCell>Barcode</Table.HeadCell>
+						<Table.HeadCell>QR Code</Table.HeadCell>
 						<Table.HeadCell>Images</Table.HeadCell>
 						<Table.HeadCell>Actions</Table.HeadCell>
 					</Table.Head>

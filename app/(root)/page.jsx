@@ -61,11 +61,6 @@ const Home = () => {
 						data={isTransactionsLoading ? "..." : totalReturnedItems || 0}
 						iconUrl={returnedItem}
 					/>
-					<InfoBox
-						title="Lost Items"
-						data={isTransactionsLoading ? "..." : totalLostItems || 0}
-						iconUrl={lostItem}
-					/>
 				</div>
 				<div className="flex flex-wrap items-center justify-center gap-3">
 					<div className="flex-1">
