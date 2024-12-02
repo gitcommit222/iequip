@@ -399,6 +399,7 @@ const BorrowItemForm = ({ data }) => {
 															{...register("itemQty")}
 															id="itemQty"
 															name="itemQty"
+															disabled
 															type="number"
 															className="hide-arrows"
 															color={`${errors.itemQty ? "failure" : "gray"}`}
@@ -435,7 +436,9 @@ const BorrowItemForm = ({ data }) => {
 														{...register("testedBy")}
 														id="testedBy"
 														name="testedBy"
+														defaultValue={user?.fetchedUser?.name}
 														type="text"
+														disabled
 														placeholder="e.g. Kien Jayjan Peralta"
 														color={`${errors.testedBy ? "failure" : "gray"}`}
 														helperText={

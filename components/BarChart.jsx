@@ -33,7 +33,16 @@ const BarChart = () => {
 			}
 		});
 
-		return itemTransactions;
+		// Filter items with total borrows >= 5
+		const filteredTransactions = {};
+		Object.entries(itemTransactions).forEach(([itemName, quantities]) => {
+			const totalBorrows = quantities.reduce((sum, qty) => sum + qty, 0);
+			if (totalBorrows >= 5) {
+				filteredTransactions[itemName] = quantities;
+			}
+		});
+
+		return filteredTransactions;
 	}, [transactions]);
 
 	const barData = {
