@@ -365,10 +365,6 @@ const BorrowItemForm = ({ data }) => {
 														<h5 className="text-gray-500 text-[14px]">
 															{categoriesList[itemWithBarcode.item.category]}
 														</h5>
-														<p className="text-gray-500 text-[14px]">
-															Stocks:{" "}
-															<span>{itemWithBarcode.item.quantity}</span>
-														</p>
 													</div>
 												</div>
 												<div>
