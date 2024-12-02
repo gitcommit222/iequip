@@ -299,7 +299,7 @@ const BorrowItemForm = ({ data }) => {
 									<h1 className="form-header">Item Info</h1>
 									<div>
 										<div className="mb-1 block">
-											<Label htmlFor="itemBarcode" value="Item Barcode" />
+											<Label htmlFor="itemBarcode" value="Item QR Code" />
 										</div>
 										<div className="flex gap-2 items-center">
 											<div className="flex-1">

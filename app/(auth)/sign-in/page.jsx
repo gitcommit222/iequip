@@ -114,13 +114,13 @@ const SignIn = () => {
 					>
 						{isSubmitting ? "Logging in..." : "Login"}
 					</Button>
-					<p className="text-gray2 text-[14px] text-center">
+					{/* <p className="text-gray2 text-[14px] text-center">
 						Don't have an account?{" "}
 						<Link className="font-medium text-primary" href="sign-up">
 							Sign up
 						</Link>
 						.
-					</p>
+					</p> */}
 				</form>
 			</div>
 		</div>
