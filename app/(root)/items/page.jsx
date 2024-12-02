@@ -179,12 +179,12 @@ const Items = () => {
 						<Table.HeadCell onClick={() => handleSort("category")}>
 							Category
 						</Table.HeadCell>
-						<Table.HeadCell onClick={() => handleSort("quantity")}>
+						{/* <Table.HeadCell onClick={() => handleSort("quantity")}>
 							Quantity
 						</Table.HeadCell>
 						<Table.HeadCell onClick={() => handleSort("unit")}>
 							Unit
-						</Table.HeadCell>
+						</Table.HeadCell> */}
 						<Table.HeadCell onClick={() => handleSort("item_condition")}>
 							Condition
 						</Table.HeadCell>
@@ -207,10 +207,10 @@ const Items = () => {
 										</Tooltip>
 									</Table.Cell>
 									<Table.Cell>{categoriesList[item.category]}</Table.Cell>
-									<Table.Cell>
+									{/* <Table.Cell>
 										{item.quantity > 0 ? item.quantity : "Out of Stock"}
 									</Table.Cell>
-									<Table.Cell>{item.unit}</Table.Cell>
+									<Table.Cell>{item.unit}</Table.Cell> */}
 									<Table.Cell className="w-[20px] text-center">
 										<Badge color="success" className="text-[12px] text-nowrap">
 											<Tooltip content={item.item_condition}>
