@@ -141,52 +141,6 @@ const AddSupplyForm = ({
 								}
 							/>
 						</div>
-						<div className={type === "add" ? "" : "flex gap-3"}>
-							<div className={type === "add" ? "" : "flex-1"}>
-								<div className="mb-2 block">
-									<Label
-										htmlFor="quantity_available"
-										value="Quantity Available"
-									/>
-								</div>
-								<TextInput
-									{...register("quantity_available")}
-									id="quantity_available"
-									type="number"
-									name="quantity_available"
-									color={`${errors.quantity_available ? "failure" : "gray"}`}
-									helperText={
-										errors.quantity_available
-											? errors.quantity_available.message
-											: ""
-									}
-								/>
-							</div>
-							{type === "edit" && (
-								<div className="flex-1">
-									<div className="mb-2 block">
-										<Label
-											htmlFor="quantity_distributed"
-											value="Quantity Distributed"
-										/>
-									</div>
-									<TextInput
-										{...register("quantity_distributed")}
-										id="quantity_distributed"
-										type="number"
-										name="quantity_distributed"
-										color={`${
-											errors.quantity_distributed ? "failure" : "gray"
-										}`}
-										helperText={
-											errors.quantity_distributed
-												? errors.quantity_distributed.message
-												: ""
-										}
-									/>
-								</div>
-							)}
-						</div>
 						<div>
 							<div className="mb-2 block">
 								<Label htmlFor="unit" value="Unit" />

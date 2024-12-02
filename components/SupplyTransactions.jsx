@@ -21,6 +21,8 @@ const SupplyTransactions = () => {
 	const { data: distributed, isLoading: isDistributedItemLoading } =
 		useGetSupplyTransactions();
 
+	console.log(distributed);
+
 	const { mutateAsync: deleteSupplyTransaction } = useDeleteSupplyTransaction();
 
 	const [openModal, setOpenModal] = useState(false);
@@ -55,17 +57,17 @@ const SupplyTransactions = () => {
 						{distributed &&
 							distributed.map((item) => (
 								<Table.Row
-									className={`bg-white dark:border-gray-700 dark:bg-gray-800`}
+									className="bg-white dark:border-gray-700 dark:bg-gray-800"
 									key={item.id}
 								>
 									<Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-										{item?.recipient.name}
+										{item?.recipient?.name}
 									</Table.Cell>
-									<Table.Cell>{item?.recipient.email}</Table.Cell>
+									<Table.Cell>{item?.recipient?.email}</Table.Cell>
 									<Table.Cell className="flex gap-2">
 										{item?.supplies.map((s) => (
 											<p key={s.id}>
-												{s?.item_name} ({s?.quantity_distributed})
+												{s?.item_name} ({s?.SupplyTransactionItems?.quantity})
 											</p>
 										))}
 									</Table.Cell>
