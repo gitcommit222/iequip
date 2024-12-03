@@ -132,7 +132,7 @@ export const useUpdateItem = () => {
 	return useMutation({
 		mutationFn: updateItem,
 		onSuccess: () => {
-			queryClient.invalidateQueries(["items", "item"]);
+			queryClient.invalidateQueries(["items"]);
 		},
 	});
 };

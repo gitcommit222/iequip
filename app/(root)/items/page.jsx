@@ -212,17 +212,24 @@ const Items = () => {
 									</Table.Cell>
 									<Table.Cell>{item.unit}</Table.Cell> */}
 									<Table.Cell className="w-[20px] text-center">
-										<Badge color="success" className="text-[12px] text-nowrap">
-											<Tooltip content={item.item_condition}>
-												<p className="text-center">GOOD</p>
-											</Tooltip>
+										<Badge
+											color={
+												item.item_condition === "Good"
+													? "success"
+													: item.item_condition === "Slightly Damaged"
+													? "warning"
+													: "failure"
+											}
+											className="text-[12px] text-nowrap"
+										>
+											<p className="text-center">{item.item_condition}</p>
 										</Badge>
 									</Table.Cell>
 									<Table.Cell>
 										<div className="flex items-center space-x-2">
 											<CustomPopover
 												trigger="hover"
-												title="Item barcode"
+												title="Item QR Code"
 												saveBtn={
 													<Button
 														size="xs"
@@ -264,7 +271,7 @@ const Items = () => {
 												size="xs"
 												color="gray"
 												onClick={() => copyBarcodeToClipboard(item.barcode)}
-												title="Copy barcode to clipboard"
+												title="Copy QR Code value to clipboard"
 											>
 												<FaCopy size={15} />
 											</Button>

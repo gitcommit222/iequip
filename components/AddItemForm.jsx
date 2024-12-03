@@ -63,8 +63,7 @@ const AddItemForm = ({
 		defaultValues: {
 			itemName: data ? data?.name : "",
 			category: data ? data.category : 0,
-			quantity: data ? data.quantity : 1,
-			unit: data ? data.unit : "",
+			itemCondition: data ? data.item_condition : "",
 			file: data ? data.image_path : "",
 		},
 		resolver: yupResolver(addItemFormSchema),
@@ -75,24 +74,12 @@ const AddItemForm = ({
 		if (data) {
 			setValue("itemName", data.name);
 			setValue("category", data.category);
-			setValue("quantity", data.quantity);
-			setValue("unit", data.unit);
 			setValue("file", data.image_path);
 		}
 	}, [data, setValue]);
 
 	const onSubmit = async (data) => {
-		const {
-			itemName,
-			category,
-			quantity,
-			unit,
-			itemCondition,
-			file,
-			damagedItemQty,
-		} = data;
-		console.log("!!!UNIT: " + unit);
-
+		const { itemName, category, itemCondition, file, damagedItemQty } = data;
 		try {
 			const itemLetters = itemName.substring(0, 3).toUpperCase();
 			const randomNum =
@@ -102,10 +89,8 @@ const AddItemForm = ({
 			const itemData = {
 				name: itemName,
 				category,
-				quantity,
 				barcode,
-				unit,
-				item_condition: "Good",
+				item_condition: itemCondition,
 			};
 
 			if (!file) {
@@ -169,7 +154,9 @@ const AddItemForm = ({
 				className="p-10"
 			>
 				<Modal.Body className="hide-scrollbar">
-					<h1 className="text-[28px] font-medium mb-4">ADD ITEM FORM</h1>
+					<h1 className="text-[28px] font-medium mb-4">
+						{type === "add" ? "ADD ITEM FORM" : "EDIT ITEM FORM"}
+					</h1>
 					<form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
 						<div>
 							<div className="mb-2 block">
@@ -207,34 +194,22 @@ const AddItemForm = ({
 						<div className="flex gap-3">
 							<div className="flex-1">
 								<div className="mb-2 block">
-									<Label htmlFor="unit" value="Unit" />
+									<Label htmlFor="itemCondition" value="Item Condition" />
 								</div>
 								<Select
-									{...register("unit")}
-									id="unit"
-									name="unit"
-									color={`${errors.unit ? "failure" : "gray"}`}
-									helperText={errors.unit ? errors.unit.message : ""}
+									{...register("itemCondition")}
+									id="itemCondition"
+									name="itemCondition"
+									color={`${errors.itemCondition ? "failure" : "gray"}`}
+									helperText={
+										errors.itemCondition ? errors.itemCondition.message : ""
+									}
 								>
 									<option value="" disabled></option>
-									<option value="Unit">Unit</option>
-									<option value="Set">Set</option>
-									<option value="Pcs">Pcs</option>
-									<option value="Pack">Pack</option>
+									<option value="Good">Good</option>
+									<option value="Slightly Damaged">Slightly Damaged</option>
+									<option value="Damaged">Damaged</option>
 								</Select>
-							</div>
-							<div className="max-w-[180px] w-[180px]">
-								<div className="mb-2 block">
-									<Label htmlFor="quantity" value="Quantity" />
-								</div>
-								<TextInput
-									{...register("quantity")}
-									id="quantity"
-									disabled
-									name="quantity"
-									color={`${errors.quantity ? "failure" : "gray"}`}
-									helperText={errors.quantity ? errors.quantity.message : ""}
-								/>
 							</div>
 						</div>
 						<div className="space-y-1">
