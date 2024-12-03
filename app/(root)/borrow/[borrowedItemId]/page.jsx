@@ -152,7 +152,7 @@ const BorrowedItemPage = ({ params }) => {
 										<option value="good">
 											Good
 										</option>
-									<option value="slightlyDamaged">
+									<option value="Slightly Damaged">
 											Slightly Damaged
 										</option>
 									<option value="damaged">
