@@ -136,6 +136,32 @@ const BorrowedItemPage = ({ params }) => {
 						<div className="space-y-3">
 							<div>
 								<Label
+									htmlFor="returnedCondition"
+									value="Returned Condition"
+									className="mb-1 block text-sm"
+								/>
+								<Select
+									id="returnedCondition"
+									onChange={(e) => setNewCondition(e.target.value)}
+									value={newCondition}
+									name="returnedCondition"
+								>
+										<option value={borrowedItem?.item?.item_condition}>
+											{borrowedItem?.item?.item_condition}
+										</option>
+										<option value="good">
+											Good
+										</option>
+									<option value="slightlyDamaged">
+											Slightly Damaged
+										</option>
+									<option value="damaged">
+											Damaged
+										</option>
+								</Select>
+							</div>
+							<div>
+								<Label
 									htmlFor="quantity"
 									value="Returned Quantity"
 									className="mb-1 block text-sm"
