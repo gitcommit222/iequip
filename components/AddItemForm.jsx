@@ -79,53 +79,56 @@ const AddItemForm = ({
 	}, [data, setValue]);
 
 	const onSubmit = async (data) => {
-		const { itemName, category, itemCondition, file, damagedItemQty } = data;
+		const { itemName, category, itemCondition, file } = data;
 		try {
-			const itemLetters = itemName.substring(0, 3).toUpperCase();
-			const randomNum =
-				Math.floor(Math.random() * (9999999 - 1000000 + 1)) + 1000000;
-			const barcode = `${itemLetters}${category}${randomNum}`;
-
 			const itemData = {
 				name: itemName,
 				category,
-				barcode,
 				item_condition: itemCondition,
 			};
 
-			if (!file) {
-				console.error("No file selected");
-				return;
-			}
 			if (type === "add") {
+				if (!file) {
+					console.error("No file selected");
+					return;
+				}
+
+				const itemLetters = itemName.substring(0, 3).toUpperCase();
+				const randomNum =
+					Math.floor(Math.random() * (9999999 - 1000000 + 1)) + 1000000;
+				const barcode = `${itemLetters}${category}${randomNum}`;
+				itemData.barcode = barcode;
+
 				try {
 					await toast.promise(addItemMutation({ file, itemData }), {
 						success: "Item added!",
 						loading: "Adding item...",
 						error: "Error adding item.",
 					});
-
-					reset();
-					setFile("");
-					setOpenModal(false);
 				} catch (error) {
 					console.error("Error adding item:", error.message);
+					return;
 				}
 			} else {
+				if (file instanceof File) {
+					itemData.file = file;
+				}
+
 				try {
 					await toast.promise(updateItem({ itemId, newItemData: itemData }), {
 						success: "Item updated!",
 						loading: "Updating item...",
 						error: "Error updating item.",
 					});
-
-					reset();
-					setFile("");
-					setOpenModal(false);
 				} catch (error) {
-					console.error("Error adding item:", error.message);
+					console.error("Error updating item:", error.message);
+					return;
 				}
 			}
+
+			reset();
+			setFile("");
+			setOpenModal(false);
 		} catch (error) {
 			setError("root", {
 				message: "Invalid credentials",

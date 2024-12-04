@@ -20,8 +20,8 @@ export const useLogin = () => {
 	return useMutation({
 		mutationFn: loginUser,
 		onSuccess: (data) => {
-			console.log(data.user);
 			queryClient.setQueryData(["user"], data.user);
+			localStorage.setItem("token", data.token);
 		},
 		onError: () => {},
 	});
@@ -43,8 +43,10 @@ export const useUser = () => {
 	});
 };
 
-const logoutUser = () => {
-	localStorage.removeItem("token");
+const logoutUser = async () => {
+	const response = await api.post("/users/logout");
+
+	return response.data;
 };
 
 export const useLogout = () => {
@@ -52,6 +54,7 @@ export const useLogout = () => {
 	return useMutation({
 		mutationFn: logoutUser,
 		onSuccess: () => {
+			localStorage.removeItem("token");
 			queryClient.setQueryData(["user"], null);
 		},
 	});
