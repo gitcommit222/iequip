@@ -112,10 +112,23 @@ export const useGetItemByBarcode = (barcode) => {
 	});
 };
 
-const updateItem = async ({ itemId, newItemData }) => {
+const updateItem = async ({ file, itemId, newItemData }) => {
 	try {
-		const response = await api.put(`/items/update/${itemId}`, {
-			newItemData,
+		const formData = new FormData();
+		if (file) {
+			formData.append("image", file);
+		}
+		for (const key in newItemData) {
+			if (newItemData.hasOwnProperty(key)) {
+				formData.append(key, newItemData[key]);
+			}
+		}
+
+		console.log(file);
+		const response = await api.put(`/items/update/${itemId}`, formData, {
+			headers: {
+				"Content-Type": "multipart/form-data",
+			},
 		});
 
 		return response.data;

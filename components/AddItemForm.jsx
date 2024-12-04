@@ -110,16 +110,21 @@ const AddItemForm = ({
 					return;
 				}
 			} else {
-				if (file instanceof File) {
-					itemData.file = file;
-				}
-
 				try {
-					await toast.promise(updateItem({ itemId, newItemData: itemData }), {
-						success: "Item updated!",
-						loading: "Updating item...",
-						error: "Error updating item.",
-					});
+					const fileToUpdate = file instanceof File ? file : undefined;
+
+					await toast.promise(
+						updateItem({
+							file: fileToUpdate,
+							itemId,
+							newItemData: itemData,
+						}),
+						{
+							success: "Item updated!",
+							loading: "Updating item...",
+							error: "Error updating item.",
+						}
+					);
 				} catch (error) {
 					console.error("Error updating item:", error.message);
 					return;

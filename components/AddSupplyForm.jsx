@@ -7,6 +7,7 @@ import {
 	Modal,
 	Spinner,
 	FileInput,
+	Datepicker,
 } from "flowbite-react";
 import { useState, useEffect } from "react";
 import { useCreateGoods, useUpdateGoods } from "../hooks/useGoods";
@@ -57,6 +58,7 @@ const AddSupplyForm = ({
 			remarks: data ? data.remarks : "",
 			category: data ? data.category : "",
 			file: data ? data.image_path : "",
+			expiration_date: data ? data.expiration_date : "",
 		},
 		resolver: yupResolver(addSupplyFormSchema),
 	});
@@ -141,24 +143,46 @@ const AddSupplyForm = ({
 								}
 							/>
 						</div>
-						<div>
-							<div className="mb-2 block">
-								<Label htmlFor="unit" value="Unit" />
+						<div className="flex gap-4">
+							<div className="flex-1">
+								<div className="mb-2 block">
+									<Label
+										htmlFor="quantity_available"
+										value="Available Quantity"
+									/>
+								</div>
+								<TextInput
+									{...register("quantity_available")}
+									id="quantity_available"
+									type="number"
+									name="quantity_available"
+									color={`${errors.quantity_available ? "failure" : "gray"}`}
+									helperText={
+										errors.quantity_available
+											? errors.quantity_available.message
+											: ""
+									}
+								/>
 							</div>
-							<Select
-								{...register("unit")}
-								id="unit"
-								name="unit"
-								color={`${errors.unit ? "failure" : "gray"}`}
-								helperText={errors.unit ? errors.unit.message : ""}
-							>
-								<option value="">Select a unit</option>
-								{supplyUnits.map((unit) => (
-									<option key={unit} value={unit}>
-										{unit}
-									</option>
-								))}
-							</Select>
+							<div className="flex-1">
+								<div className="mb-2 block">
+									<Label htmlFor="unit" value="Unit" />
+								</div>
+								<Select
+									{...register("unit")}
+									id="unit"
+									name="unit"
+									color={`${errors.unit ? "failure" : "gray"}`}
+									helperText={errors.unit ? errors.unit.message : ""}
+								>
+									<option value="">Select a unit</option>
+									{supplyUnits.map((unit) => (
+										<option key={unit} value={unit}>
+											{unit}
+										</option>
+									))}
+								</Select>
+							</div>
 						</div>
 						<div>
 							<div className="mb-2 block">
@@ -191,6 +215,17 @@ const AddSupplyForm = ({
 									</option>
 								))}
 							</Select>
+						</div>
+						<div>
+							<div className="mb-2 block">
+								<Label htmlFor="expiration_date" value="Expiration Date" />
+								<input
+									{...register("expiration_date")}
+									id="expiration_date"
+									name="expiration_date"
+									type="date"
+								/>
+							</div>
 						</div>
 						<div className="space-y-1">
 							<h3 className="text-[18px] font-medium text-gray-500 font-Montserrat mb-2">

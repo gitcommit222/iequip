@@ -165,11 +165,9 @@ const Supplies = () => {
 						<Table.HeadCell onClick={() => handleSort("quantity_distributed")}>
 							Quantity Distributed
 						</Table.HeadCell>
-						<Table.HeadCell onClick={() => handleSort("unit")}>
-							Unit
-						</Table.HeadCell>
+
 						<Table.HeadCell onClick={() => handleSort("remarks")}>
-							Remarks
+							Expiration Date
 						</Table.HeadCell>
 						<Table.HeadCell>Actions</Table.HeadCell>
 					</Table.Head>
@@ -200,8 +198,7 @@ const Supplies = () => {
 									<Table.Cell>{truncateText(item.description, 30)}</Table.Cell>
 									<Table.Cell>{item.quantity_available}</Table.Cell>
 									<Table.Cell>{item.quantity_distributed}</Table.Cell>
-									<Table.Cell>{item.unit}</Table.Cell>
-									<Table.Cell>{truncateText(item.remarks, 20)}</Table.Cell>
+									<Table.Cell>{item.expiration_date}</Table.Cell>
 									<Table.Cell className="flex gap-2">
 										<AddSupplyForm
 											className="text-cyan-500 font-medium"
