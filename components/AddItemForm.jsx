@@ -85,6 +85,8 @@ const AddItemForm = ({
 				name: itemName,
 				category,
 				item_condition: itemCondition,
+				unit: "pcs",
+				quantity: 1,
 			};
 
 			if (type === "add") {

@@ -31,6 +31,40 @@ import * as XLSX from "xlsx";
 import ItemImage from "../../../components/ItemImage";
 import Headerbox from "../../../components/shared/Headerbox";
 import QRCode, { QRCodeCanvas } from "qrcode.react";
+import {
+	PDFDownloadLink,
+	Document,
+	Page,
+	View,
+	Text,
+	StyleSheet,
+	pdf,
+	Image as PDFImage,
+} from "@react-pdf/renderer";
+import { saveAs } from "file-saver";
+
+const styles = StyleSheet.create({
+	page: {
+		padding: 20,
+		flexDirection: "row",
+		flexWrap: "wrap",
+		gap: 20,
+	},
+	qrContainer: {
+		width: "45%",
+		marginBottom: 20,
+		alignItems: "center",
+	},
+	itemName: {
+		fontSize: 10,
+		marginTop: 5,
+		textAlign: "center",
+	},
+	qrCode: {
+		width: 100,
+		height: 100,
+	},
+});
 
 const Items = () => {
 	const barcodeRef = useRef();
@@ -129,6 +163,42 @@ const Items = () => {
 		}
 	}, [items]);
 
+	const QRDocument = () => (
+		<Document>
+			{chunk(filteredAndSortedItems, 8).map((pageItems, pageIndex) => (
+				<Page key={pageIndex} size="A4" style={styles.page}>
+					{pageItems.map((item, index) => (
+						<View key={index} style={styles.qrContainer}>
+							<PDFImage
+								style={styles.qrCode}
+								src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(
+									item.barcode
+								)}`}
+							/>
+							<Text style={styles.itemName}>{truncateText(item.name, 20)}</Text>
+						</View>
+					))}
+				</Page>
+			))}
+		</Document>
+	);
+
+	const exportQRCodesToPDF = async () => {
+		if (!filteredAndSortedItems.length) return;
+
+		const blob = await pdf(<QRDocument />).toBlob();
+		saveAs(blob, "qr-codes.pdf");
+	};
+
+	// Helper function to split array into chunks
+	const chunk = (arr, size) => {
+		const chunks = [];
+		for (let i = 0; i < arr.length; i += size) {
+			chunks.push(arr.slice(i, i + size));
+		}
+		return chunks;
+	};
+
 	return (
 		<section className="space-y-4">
 			<div className="w-full flex items-center justify-between mb-4">
@@ -168,6 +238,10 @@ const Items = () => {
 				<Button onClick={exportToExcel} color="success">
 					<FaFileExport className="mr-2" />
 					Export to Excel
+				</Button>
+				<Button onClick={exportQRCodesToPDF} color="info">
+					<FaFileExport className="mr-2" />
+					Export QR Codes
 				</Button>
 			</div>
 			<div className="overflow-x-auto  min-h-[500px]">
