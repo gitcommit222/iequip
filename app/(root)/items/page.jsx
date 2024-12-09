@@ -74,6 +74,7 @@ const Items = () => {
 		key: "name",
 		direction: "asc",
 	});
+	const [selectedItems, setSelectedItems] = useState([]);
 
 	const { mutateAsync: deleteItem } = useDeleteItems();
 	const { data: items, isLoading: isItemLoading } = useGetItems();
@@ -163,9 +164,22 @@ const Items = () => {
 		}
 	}, [items]);
 
+	const handleItemSelect = (itemId) => {
+		setSelectedItems(prev => {
+			if (prev.includes(itemId)) {
+				return prev.filter(id => id !== itemId);
+			} else {
+				return [...prev, itemId];
+			}
+		});
+	};
+
 	const QRDocument = () => (
 		<Document>
-			{chunk(filteredAndSortedItems, 8).map((pageItems, pageIndex) => (
+			{chunk(
+				filteredAndSortedItems.filter(item => selectedItems.includes(item.id)),
+				8
+			).map((pageItems, pageIndex) => (
 				<Page key={pageIndex} size="A4" style={styles.page}>
 					{pageItems.map((item, index) => (
 						<View key={index} style={styles.qrContainer}>
@@ -184,7 +198,10 @@ const Items = () => {
 	);
 
 	const exportQRCodesToPDF = async () => {
-		if (!filteredAndSortedItems.length) return;
+		if (selectedItems.length === 0) {
+			toast.error('Please select items to export');
+			return;
+		}
 
 		const blob = await pdf(<QRDocument />).toBlob();
 		saveAs(blob, "qr-codes.pdf");
@@ -247,6 +264,9 @@ const Items = () => {
 			<div className="overflow-x-auto  min-h-[500px]">
 				<Table>
 					<Table.Head>
+						<Table.HeadCell>
+							Select
+						</Table.HeadCell>
 						<Table.HeadCell onClick={() => handleSort("name")}>
 							Item name
 						</Table.HeadCell>
@@ -275,6 +295,14 @@ const Items = () => {
 										item.quantity === 0 ? "opacity-50 pointer-events-none" : ""
 									}`}
 								>
+									<Table.Cell>
+										<input
+											type="checkbox"
+											checked={selectedItems.includes(item.id)}
+											onChange={() => handleItemSelect(item.id)}
+											className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+										/>
+									</Table.Cell>
 									<Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
 										<Tooltip content={item.name}>
 											{truncateText(item?.name, 20)}
