@@ -1,34 +1,20 @@
 import api from "../utils/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-const borrowItem = async ({
-	name,
-	email,
-	age,
-	contact_number,
-	department,
-	address,
-	item_id,
-	end_date,
-	tested_by,
-	item_qty,
-	remarks,
-}) => {
-	const response = await api.post("/borrow/borrow-item", {
-		name,
-		email,
-		age,
-		contact_number,
-		department,
-		address,
-		item_id,
-		end_date,
-		tested_by,
-		remarks,
-		item_qty,
-	});
+const borrowItem = async (submissionData) => {
+	try {
+		const response = await api.post("/borrow/borrow-item", submissionData);
 
-	return response.data;
+		return response.data;
+	} catch (error) {
+		if (error.response) {
+			throw new Error(error.response.data.message || "Login failed");
+		} else if (error.request) {
+			throw new Error("No response from server");
+		} else {
+			throw new Error("Error in login request: " + error.message);
+		}
+	}
 };
 
 export const useBorrowItem = () => {

@@ -29,6 +29,7 @@ const AddItemForm = ({
 	btnTitle = "New Item",
 	type = "add",
 	itemId,
+	datePurchase,
 }) => {
 	const [file, setFile] = useState("");
 
@@ -65,6 +66,7 @@ const AddItemForm = ({
 			category: data ? data.category : 0,
 			itemCondition: data ? data.item_condition : "",
 			file: data ? data.image_path : "",
+			datePurchase: data ? data.date_purchase : "",
 		},
 		resolver: yupResolver(addItemFormSchema),
 	});
@@ -75,11 +77,12 @@ const AddItemForm = ({
 			setValue("itemName", data.name);
 			setValue("category", data.category);
 			setValue("file", data.image_path);
+			setValue("datePurchase", data.date_purchase);
 		}
 	}, [data, setValue]);
 
 	const onSubmit = async (data) => {
-		const { itemName, category, itemCondition, file } = data;
+		const { itemName, category, itemCondition, file, datePurchase } = data;
 		try {
 			const itemData = {
 				name: itemName,
@@ -87,6 +90,7 @@ const AddItemForm = ({
 				item_condition: itemCondition,
 				unit: "pcs",
 				quantity: 1,
+				date_purchase: datePurchase,
 			};
 
 			if (type === "add") {
@@ -100,7 +104,6 @@ const AddItemForm = ({
 					Math.floor(Math.random() * (9999999 - 1000000 + 1)) + 1000000;
 				const barcode = `${itemLetters}${category}${randomNum}`;
 				itemData.barcode = barcode;
-
 				try {
 					await toast.promise(addItemMutation({ file, itemData }), {
 						success: "Item added!",
@@ -114,6 +117,7 @@ const AddItemForm = ({
 			} else {
 				try {
 					const fileToUpdate = file instanceof File ? file : undefined;
+
 
 					await toast.promise(
 						updateItem({
@@ -290,6 +294,19 @@ const AddItemForm = ({
 									/>
 								</Label>
 							</div>
+						</div>
+						<div>
+							<div className="mb-2 block">
+								<Label htmlFor="datePurchase" value="Date of Purchase" />
+							</div>
+							<TextInput
+								{...register("datePurchase")}
+								id="datePurchase"
+								type="date"
+								name="datePurchase"
+								color={`${errors.datePurchase ? "failure" : "gray"}`}
+								helperText={errors.datePurchase ? errors.datePurchase.message : ""}
+							/>
 						</div>
 						<div className="flex gap-3">
 							<Button

@@ -1,12 +1,5 @@
 "use client";
-import {
-	Button,
-	Datepicker,
-	Label,
-	Modal,
-	Select,
-	TextInput,
-} from "flowbite-react";
+import { Button, Label, Modal, Select, TextInput } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { BorrowItemSchema } from "../lib/schema";
 import ItemImage from "../components/ItemImage";
@@ -14,27 +7,30 @@ import ItemImage from "../components/ItemImage";
 import { useGetItemByBarcode } from "../hooks/useItem";
 import { useCreateTransaction } from "../hooks/useTransactions";
 
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { format, parseISO } from "date-fns"; // Add parseISO import
+import { format, parseISO } from "date-fns";
 
 import { categoriesList } from "../lib/categories";
 import { FaCircleExclamation } from "react-icons/fa6";
 import { BiQrScan } from "react-icons/bi";
-
 import { FaCheckCircle, FaMinusCircle } from "react-icons/fa";
 import toast from "react-hot-toast";
 
 import QRCodeScanner from "../components/QRScanner";
 import { useUser } from "../hooks/useAuth";
+import Image from "next/image";
+import { getImageUrl } from "../utils/imageUtils";
 
 const BorrowItemForm = ({ data }) => {
 	const [openModal, setOpenModal] = useState(false);
 	const [openScanner, setOpenScanner] = useState(false);
 	const [barcode, setBarcode] = useState("");
+	const [items, setItems] = useState([]);
+	const [mrName, setMrName] = useState("");
+	const [proofImage, setProofImage] = useState(null);
 
 	const { data: user } = useUser();
-
 	const borrowItemMutation = useCreateTransaction();
 
 	const {
@@ -42,8 +38,6 @@ const BorrowItemForm = ({ data }) => {
 		handleSubmit,
 		reset,
 		setError,
-		control,
-		trigger,
 		watch,
 		setValue,
 		formState: { errors, isSubmitting },
@@ -56,7 +50,6 @@ const BorrowItemForm = ({ data }) => {
 			fullAddress: data?.address || "",
 			department: data?.department || "",
 			itemBarcode: data?.barcode || "",
-			itemQty: data?.quantity || 1,
 			testedBy: data?.testedBy || user?.fetchedUser?.name,
 			returnDate: data?.end_date
 				? format(parseISO(data.end_date), "yyyy-MM-dd'T'HH:mm")
@@ -74,39 +67,85 @@ const BorrowItemForm = ({ data }) => {
 		error: itemError,
 	} = useGetItemByBarcode(watchedBarcode?.length >= 11 ? watchedBarcode : null);
 
+	const addItem = (barcode, quantity = 1) => {
+		if (itemWithBarcode) {
+			const existingItem = items.find((item) => item.barcode === barcode);
+			if (existingItem) {
+				toast.error("Item already added");
+				return;
+			}
+
+			setItems([
+				...items,
+				{
+					id: itemWithBarcode.item.id,
+					barcode: barcode,
+					name: itemWithBarcode.item.name,
+					quantity: quantity,
+					condition: itemWithBarcode.item.item_condition,
+					image: itemWithBarcode.item.image_path,
+					category: itemWithBarcode.item.category,
+				},
+			]);
+
+			setBarcode("");
+			setValue("itemBarcode", "");
+		}
+	};
+
+	const removeItem = (barcode) => {
+		setItems(items.filter((item) => item.barcode !== barcode));
+	};
+
 	const onSubmit = async (formData) => {
 		try {
-			await toast.promise(
-				borrowItemMutation.mutateAsync({
-					recipientInfo: {
-						name: formData.fullName,
-						email: formData.email,
-						age: formData.age,
-						contact_number: formData.contactNumber,
-						department: formData.department,
-						address: formData.fullAddress,
-					},
-					itemInfo: {
-						category: "items",
-						item_id: itemWithBarcode?.item.id,
-						borrowed_qty: formData.itemQty,
-						end_date: formData.returnDate,
-						tested_by: formData.testedBy,
-					},
-				}),
-				{
-					success: "Borrow Success!",
-					loading: "Loading...",
-					error: "Something went wrong.",
-				}
-			);
+			// Validate if items exist
+			if (items.length === 0) {
+				toast.error("Please add at least one item");
+				return;
+			}
 
+			// Prepare the data according to controller expectations
+			const submissionData = {
+				recipientInfo: {
+					name: formData.fullName,
+					email: formData.email,
+					age: parseInt(formData.age),
+					contact_number: formData.contactNumber,
+					department: formData.department,
+					address: formData.fullAddress,
+				},
+				itemList: items.map((item) => item.id),
+				end_date: formData.returnDate,
+				tested_by: formData.testedBy,
+				proof_image: proofImage,
+			};
+
+			// Submit using mutation
+			await toast.promise(borrowItemMutation.mutateAsync(submissionData), {
+				loading: "Submitting...",
+				success: "Submitted successfully!",
+				error: "Submission failed.",
+			});
+
+			if (borrowItemMutation.isError) {
+				const error = borrowItemMutation.error;
+				if (error.response?.status === 400) {
+					toast.error(error.response.data.message);
+				}
+			}
+
+			// Reset form and close modal on success
 			reset();
+			setItems([]);
 			setBarcode("");
 			setOpenModal(false);
 		} catch (error) {
+			console.error("Submission error:", error);
+			toast.error(error.message || "Something went wrong during submission");
 			setError("root", {
-				message: "Invalid Inputs",
+				type: "manual",
+				message: "Failed to submit form",
 			});
 		}
 	};
@@ -116,20 +155,23 @@ const BorrowItemForm = ({ data }) => {
 		setValue("returnDate", newDate);
 	};
 
+	const handleOnScanned = (result) => {
+		if (result) {
+			const cleanBarcode = result.replace(/"/g, "");
+			setBarcode(cleanBarcode);
+			setValue("itemBarcode", cleanBarcode);
+			if (itemWithBarcode) {
+				addItem(cleanBarcode);
+			}
+			setOpenScanner(false);
+		}
+	};
+
 	useEffect(() => {
-		// When the modal opens, we need to ensure that the scanner only initializes then.
 		if (openScanner) {
 			console.log("Modal opened, initializing scanner...");
 		}
 	}, [openScanner]);
-
-	const handleOnScanned = (result) => {
-		if (result) {
-			setBarcode(result.replace(/"/g, ""));
-			setValue("itemBarcode", barcode);
-			setOpenScanner(false);
-		}
-	};
 
 	const departmentOptions = [
 		{ value: "PGO", label: "PGO (Provincial Governor's Office)" },
@@ -292,21 +334,22 @@ const BorrowItemForm = ({ data }) => {
 				<Modal.Body className="hide-scrollbar">
 					<div className="w-full py-4">
 						<div className="mb-4">
-							<h1 className="font-semibold text-[25px]">Borrow Item Form</h1>
-							<p className="text-gray-700]">
+							<h1 className="font-semibold text-[25px]">Borrow Items Form</h1>
+							<p className="text-gray-700">
 								Fill in the fields to complete the borrow request.
 							</p>
 						</div>
 						<form onSubmit={handleSubmit(onSubmit)}>
 							<div>
 								<div className="flex-1 space-y-3 mb-5">
-									<h1 className="form-header">Borrowers Info</h1>
+									<h1 className="form-header">Borrower's Info</h1>
+									{/* Borrower Info Fields */}
 									<div className="field-container flex gap-3">
 										<div className="flex-1">
 											<div className="mb-1 block">
 												<Label
 													htmlFor="borrowerName"
-													value="Borrowers Full Name"
+													value="Borrower's Full Name"
 												/>
 											</div>
 											<TextInput
@@ -336,6 +379,7 @@ const BorrowItemForm = ({ data }) => {
 											/>
 										</div>
 									</div>
+
 									<div className="field-container flex gap-3">
 										<div className="flex-1">
 											<div className="mb-1 block">
@@ -370,6 +414,7 @@ const BorrowItemForm = ({ data }) => {
 											/>
 										</div>
 									</div>
+
 									<div className="field-container">
 										<div className="mb-1 block">
 											<Label htmlFor="fullAddress" value="Full Address" />
@@ -406,9 +451,24 @@ const BorrowItemForm = ({ data }) => {
 											))}
 										</Select>
 									</div>
+
+									<div className="field-container">
+										<div className="mb-1 block">
+											<Label htmlFor="mrName" value="M.R." />
+										</div>
+										<TextInput
+											id="mrName"
+											name="mrName"
+											type="text"
+											placeholder="e.g. Maria Reyes"
+											value={mrName}
+											onChange={(e) => setMrName(e.target.value)}
+										/>
+									</div>
 								</div>
+
 								<div className="space-y-3 mb-5">
-									<h1 className="form-header">Item Info</h1>
+									<h1 className="form-header">Items Info</h1>
 									<div>
 										<div className="mb-1 block">
 											<Label htmlFor="itemBarcode" value="Item QR Code" />
@@ -419,7 +479,7 @@ const BorrowItemForm = ({ data }) => {
 													{...register("itemBarcode")}
 													id="itemBarcode"
 													type="text"
-													placeholder={`${barcode || "e.g. ITE12312312"} `}
+													placeholder={`${barcode || "e.g. ITE12312312"}`}
 													name="itemBarcode"
 													color={`${errors.itemBarcode ? "failure" : "gray"}`}
 													onChange={(e) => setBarcode(e.target.value)}
@@ -431,11 +491,13 @@ const BorrowItemForm = ({ data }) => {
 											<div>
 												<Button
 													onClick={() => {
-														setValue("itemBarcode", barcode);
+														if (itemWithBarcode) {
+															addItem(barcode);
+														}
 													}}
 													color="gray"
 												>
-													Search
+													Add Item
 												</Button>
 											</div>
 											<div>
@@ -445,124 +507,147 @@ const BorrowItemForm = ({ data }) => {
 												>
 													<BiQrScan size={18} />
 												</Button>
-												<Modal
-													show={openScanner}
-													size="md"
-													onClose={() => setOpenScanner(false)}
-													popup
-												>
-													<Modal.Header />
-													<Modal.Body>
-														<QRCodeScanner onScanned={handleOnScanned} />
-													</Modal.Body>
-												</Modal>
 											</div>
 										</div>
 									</div>
-									{itemWithBarcode && !isItemLoading && (
-										<div className="flex flex-col gap-2 items-center">
-											<div className="item-container">
-												<div className="rounded-lg flex items-center gap-2">
-													<ItemImage
-														imagePath={itemWithBarcode.item.image_path}
-														width={60}
-														height={60}
-														className="object-contain rounded-lg"
-														alt="item image"
-													/>
-													<div>
-														<h3 className="font-semibold text-[20px]">
-															{itemWithBarcode.item?.name}
-														</h3>
-														<h5 className="text-gray-500 text-[14px]">
-															{categoriesList[itemWithBarcode.item.category]}
-														</h5>
-													</div>
-												</div>
-												<div>
+
+									{/* Added Items List */}
+									<div className="mt-4">
+										<h2 className="text-lg font-semibold mb-2">Added Items</h2>
+										{items.length === 0 ? (
+											<p className="text-gray-500 text-center">
+												No items added yet
+											</p>
+										) : (
+											<div className="space-y-2">
+												{items.map((item) => (
 													<div
-														className={`mr-4 flex gap-2 items-center ${
-															itemWithBarcode.item.item_condition === "Good"
-																? "text-primary"
-																: itemWithBarcode.item.item_condition ===
-																  "Damaged"
-																? "text-red-500"
-																: "text-yellow-300"
-														}`}
+														key={item.barcode}
+														className="flex items-center justify-between p-2 border rounded"
 													>
-														<p className="text-[14px] font-medium">
-															{itemWithBarcode.item.item_condition}
-														</p>
-														{itemWithBarcode.item.item_condition === "Good" ? (
-															<FaCheckCircle size={21} />
-														) : itemWithBarcode.item.item_condition ===
-														  "Damaged" ? (
-															<FaCircleExclamation size={21} />
-														) : (
-															<FaMinusCircle size={21} />
-														)}
+														<div className="flex items-center gap-2">
+															<Image
+																src={getImageUrl(item.image)}
+																width={40}
+																height={40}
+																className="object-contain rounded"
+																alt="item image"
+															/>
+															<div>
+																<p className="font-medium">{item.name}</p>
+																<p className="text-sm text-gray-500">
+																	{categoriesList[item.category]}
+																</p>
+																<div
+																	className={`flex gap-2 items-center ${
+																		item.condition === "Good"
+																			? "text-primary"
+																			: item.condition === "Damaged"
+																			? "text-red-500"
+																			: "text-yellow-300"
+																	}`}
+																>
+																	<p className="text-[14px] font-medium">
+																		{item.condition}
+																	</p>
+																	{item.condition === "Good" ? (
+																		<FaCheckCircle size={16} />
+																	) : item.condition === "Damaged" ? (
+																		<FaCircleExclamation size={16} />
+																	) : (
+																		<FaMinusCircle size={16} />
+																	)}
+																</div>
+															</div>
+														</div>
+														<div className="flex items-center gap-2">
+															<input
+																type="number"
+																disabled
+																value={item.quantity}
+																onChange={(e) => {
+																	const newItems = items.map((i) =>
+																		i.barcode === item.barcode
+																			? {
+																					...i,
+																					quantity:
+																						parseInt(e.target.value) || 1,
+																			  }
+																			: i
+																	);
+																	setItems(newItems);
+																}}
+																className="w-16 p-1 border rounded"
+																min="1"
+															/>
+															<Button
+																color="failure"
+																size="sm"
+																onClick={() => removeItem(item.barcode)}
+															>
+																Remove
+															</Button>
+														</div>
 													</div>
-													<div className="max-w-[50px] mt-2">
-														<TextInput
-															{...register("itemQty")}
-															id="itemQty"
-															name="itemQty"
-															disabled
-															type="number"
-															className="hide-arrows"
-															color={`${errors.itemQty ? "failure" : "gray"}`}
-															helperText={
-																errors.itemQty ? errors.itemQty.message : ""
-															}
-															min={1}
-														/>
-													</div>
-												</div>
+												))}
 											</div>
-											<div className="flex gap-2 w-full justify-start">
-												<div>
-													<div className="mb-1">
-														<Label htmlFor="returnDate" value="Return Date" />
-													</div>
-													<TextInput
-														{...register("returnDate")}
-														id="returnDate"
-														type="datetime-local"
-														color={`${errors.returnDate ? "failure" : "gray"}`}
-														helperText={
-															errors.returnDate ? errors.returnDate.message : ""
-														}
-														onChange={handleDateChange}
-														value={watch("returnDate")}
-													/>
-												</div>
-												<div className="flex-1">
-													<div className="mb-1 block">
-														<Label htmlFor="testedBy" value="Tested By" />
-													</div>
-													<TextInput
-														{...register("testedBy")}
-														id="testedBy"
-														name="testedBy"
-														defaultValue={user?.fetchedUser?.name}
-														type="text"
-														disabled
-														placeholder="e.g. Kien Jayjan Peralta"
-														color={`${errors.testedBy ? "failure" : "gray"}`}
-														helperText={
-															errors.testedBy ? errors.testedBy.message : ""
-														}
-													/>
-												</div>
+										)}
+									</div>
+
+									<div className="flex gap-2 w-full justify-start">
+										<div>
+											<div className="mb-1">
+												<Label htmlFor="returnDate" value="Return Date" />
 											</div>
+											<TextInput
+												{...register("returnDate")}
+												id="returnDate"
+												type="datetime-local"
+												color={`${errors.returnDate ? "failure" : "gray"}`}
+												helperText={
+													errors.returnDate ? errors.returnDate.message : ""
+												}
+												onChange={handleDateChange}
+												value={watch("returnDate")}
+											/>
 										</div>
-									)}
-									{isItemError && itemError && (
-										<p className="text-center text-[14px] text-gray-500">
-											Item Not found.
-										</p>
-									)}
+										<div className="flex-1">
+											<div className="mb-1 block">
+												<Label htmlFor="testedBy" value="Tested By" />
+											</div>
+											<TextInput
+												{...register("testedBy")}
+												id="testedBy"
+												name="testedBy"
+												defaultValue={user?.fetchedUser?.name}
+												type="text"
+												disabled
+												placeholder="e.g. John Doe"
+												color={`${errors.testedBy ? "failure" : "gray"}`}
+												helperText={
+													errors.testedBy ? errors.testedBy.message : ""
+												}
+											/>
+										</div>
+									</div>
 								</div>
+
+								<div className="mb-2">
+									<div className="mb-1 block">
+										<Label
+											htmlFor="proofImage"
+											value="Proof of Transaction Image"
+										/>
+									</div>
+									<input
+										type="file"
+										id="proofImage"
+										accept="image/*"
+										onChange={(e) => setProofImage(e.target.files[0])}
+										className="border rounded p-2"
+									/>
+								</div>
+
 								<div className="flex gap-2 w-full">
 									<Button
 										color="gray"
@@ -577,12 +662,24 @@ const BorrowItemForm = ({ data }) => {
 										type="submit"
 										className="flex-1"
 									>
-										{isSubmitting ? "Submitting.." : "Confirm"}
+										{isSubmitting ? "Submitting..." : "Confirm"}
 									</Button>
 								</div>
 							</div>
 						</form>
 					</div>
+				</Modal.Body>
+			</Modal>
+
+			<Modal
+				show={openScanner}
+				size="md"
+				onClose={() => setOpenScanner(false)}
+				popup
+			>
+				<Modal.Header />
+				<Modal.Body>
+					<QRCodeScanner onScanned={handleOnScanned} />
 				</Modal.Body>
 			</Modal>
 		</>

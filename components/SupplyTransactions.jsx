@@ -55,7 +55,7 @@ const SupplyTransactions = () => {
 					</Table.Head>
 					<Table.Body className="divide-y">
 						{distributed &&
-							distributed.map((item) => (
+							distributed?.data.map((item) => (
 								<Table.Row
 									className="bg-white dark:border-gray-700 dark:bg-gray-800"
 									key={item.id}

@@ -33,7 +33,7 @@ const Supplies = () => {
 	const { mutateAsync: createSupplyTransaction } = useCreateSupplyTransaction();
 
 	const goods = useMemo(() => {
-		return goodsData?.goods || [];
+		return goodsData?.data || [];
 	}, [goodsData]);
 
 	const handleDeleteGoods = (goodsId) => {

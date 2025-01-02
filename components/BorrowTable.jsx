@@ -25,22 +25,30 @@ const BorrowTable = () => {
 	const [statusFilter, setStatusFilter] = useState("all");
 	const [sortOrder, setSortOrder] = useState("desc");
 
-	const { mutateAsync: deleteTransaction } = useDeleteTransaction();
+	const {
+		mutateAsync: deleteTransaction,
+		isError,
+		error: deleteError,
+	} = useDeleteTransaction();
 
 	const { data: transactions, isLoading: isTransactionFetching } =
 		useGetTransactionsByCategory("items");
 
 	const handleDelete = async (id) => {
-		await toast.promise(deleteTransaction(id), {
-			success: "Transaction deleted successfully",
-			loading: "Deleting transaction...",
-			error: "Failed to delete transaction",
-		});
+		try {
+			await toast.promise(deleteTransaction(id), {
+				success: "Transaction deleted successfully",
+				loading: "Deleting transaction...",
+				error: "The item is currently borrowed.",
+			});
+		} catch (error) {
+			console.log("The item is currently borrowed.");
+		}
 	};
 
 	const filteredAndSortedTransactions = useMemo(() => {
 		if (!transactions) return [];
-		return transactions
+		return transactions?.data
 			.filter((item) => {
 				const matchesSearch =
 					item.recipient.name
@@ -124,7 +132,7 @@ const BorrowTable = () => {
 						<Table.HeadCell>Borrower name</Table.HeadCell>
 						<Table.HeadCell>Email</Table.HeadCell>
 						<Table.HeadCell>Borrowed Item</Table.HeadCell>
-						<Table.HeadCell>Date Borrowed</Table.HeadCell>
+						<Table.HeadCell>Return Date</Table.HeadCell>
 						<Table.HeadCell>Status</Table.HeadCell>
 						<Table.HeadCell>Actions</Table.HeadCell>
 					</Table.Head>
@@ -141,7 +149,7 @@ const BorrowTable = () => {
 									<Table.Cell>{item.recipient.email}</Table.Cell>
 									<Table.Cell>{item.item?.name || "-"}</Table.Cell>
 									<Table.Cell>
-										{format(new Date(item.start_date), "MM/dd/yy")}
+										{format(new Date(item.end_date), "MM/dd/yy")}
 									</Table.Cell>
 									<Table.Cell className="capitalize">
 										{item?.t_status}

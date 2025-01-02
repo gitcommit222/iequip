@@ -1,5 +1,6 @@
 "use client";
 import { useRef, useState, useMemo, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { toPng } from "html-to-image";
 import {
 	FaImage,
@@ -9,6 +10,8 @@ import {
 	FaSortAmountUp,
 	FaCheck,
 	FaCopy,
+	FaChevronLeft,
+	FaChevronRight,
 } from "react-icons/fa";
 import {
 	Table,
@@ -31,40 +34,8 @@ import * as XLSX from "xlsx";
 import ItemImage from "../../../components/ItemImage";
 import Headerbox from "../../../components/shared/Headerbox";
 import QRCode, { QRCodeCanvas } from "qrcode.react";
-import {
-	PDFDownloadLink,
-	Document,
-	Page,
-	View,
-	Text,
-	StyleSheet,
-	pdf,
-	Image as PDFImage,
-} from "@react-pdf/renderer";
-import { saveAs } from "file-saver";
-
-const styles = StyleSheet.create({
-	page: {
-		padding: 20,
-		flexDirection: "row",
-		flexWrap: "wrap",
-		gap: 20,
-	},
-	qrContainer: {
-		width: "45%",
-		marginBottom: 20,
-		alignItems: "center",
-	},
-	itemName: {
-		fontSize: 10,
-		marginTop: 5,
-		textAlign: "center",
-	},
-	qrCode: {
-		width: 100,
-		height: 100,
-	},
-});
+import { getImageUrl } from "../../../utils/imageUtils";
+import { format } from "date-fns";
 
 const Items = () => {
 	const barcodeRef = useRef();
@@ -75,9 +46,11 @@ const Items = () => {
 		direction: "asc",
 	});
 	const [selectedItems, setSelectedItems] = useState([]);
+	const [cursor, setCursor] = useState(null);
+	const [prevCursor, setPrevCursor] = useState(null);
 
 	const { mutateAsync: deleteItem } = useDeleteItems();
-	const { data: items, isLoading: isItemLoading } = useGetItems();
+	const { data: items, isLoading: isItemLoading } = useGetItems(cursor);
 
 	const handleDeleteItem = (itemId) => {
 		toast.promise(deleteItem(itemId), {
@@ -104,7 +77,7 @@ const Items = () => {
 
 	const filteredAndSortedItems = useMemo(() => {
 		if (!items) return [];
-		return items.items
+		return items?.data
 			.filter((item) => {
 				const matchesSearch = item.name
 					.toLowerCase()
@@ -135,20 +108,113 @@ const Items = () => {
 		}));
 	};
 
-	const exportToExcel = () => {
-		const dataToExport = filteredAndSortedItems.map((item) => ({
-			Name: item.name,
-			Category: categoriesList[item.category],
-			Quantity: item.quantity,
-			Unit: item.unit,
-			Condition: item.item_condition,
-			Barcode: item.barcode,
-		}));
-
-		const ws = XLSX.utils.json_to_sheet(dataToExport);
+	const exportToExcel = async () => {
 		const wb = XLSX.utils.book_new();
-		XLSX.utils.book_append_sheet(wb, ws, "Items");
-		XLSX.writeFile(wb, "items.xlsx");
+		try {
+			const provinceLogo = await fetch("/images/provinceLogo.png")
+				.then((res) => res.blob())
+				.then((blob) => {
+					return new Promise((resolve) => {
+						const reader = new FileReader();
+						reader.onload = () => resolve(reader.result);
+						reader.readAsDataURL(blob);
+					});
+				});
+
+			const pdrrmoLogo = await fetch("/images/pdrrmo_logo.png")
+				.then((res) => res.blob())
+				.then((blob) => {
+					return new Promise((resolve) => {
+						const reader = new FileReader();
+						reader.onload = () => resolve(reader.result);
+						reader.readAsDataURL(blob);
+					});
+				});
+
+			const headerRows = [
+				[{ t: "s", v: "" }],
+				["Republic of the Philippines"],
+				["ADMINISTRATION AND TRAINING DIVISION"],
+				[format(new Date(), "MMMM dd, yyyy")],
+				["PDRRMO Main office"],
+				["( FLOOD AND TYPHOON RESCUE EQUIPMENT )"],
+				[],
+			];
+
+			const itemsData = [
+				["Name", "Category", "Quantity", "Unit", "Condition", "Barcode"],
+				...filteredAndSortedItems.map((item) => [
+					item.name,
+					categoriesList[item.category],
+					item.quantity,
+					item.unit,
+					item.item_condition,
+					item.barcode,
+				]),
+			];
+
+			const fullData = [...headerRows, ...itemsData];
+			const ws = XLSX.utils.aoa_to_sheet(fullData);
+
+			ws["!images"] = [
+				{
+					name: "provinceLogo",
+					data: provinceLogo,
+					position: {
+						type: "twoCellAnchor",
+						from: { col: 0, row: 0 },
+						to: { col: 2, row: 2 },
+					},
+				},
+				{
+					name: "pdrrmoLogo",
+					data: pdrrmoLogo,
+					position: {
+						type: "twoCellAnchor",
+						from: { col: 4, row: 0 },
+						to: { col: 6, row: 2 },
+					},
+				},
+			];
+
+			const columnWidths = [
+				{ wch: 40 },
+				{ wch: 25 },
+				{ wch: 15 },
+				{ wch: 15 },
+				{ wch: 20 },
+				{ wch: 25 },
+			];
+			ws["!cols"] = columnWidths;
+
+			ws["!merges"] = [
+				{ s: { r: 1, c: 0 }, e: { r: 1, c: 5 } },
+				{ s: { r: 2, c: 0 }, e: { r: 2, c: 5 } },
+				{ s: { r: 3, c: 0 }, e: { r: 3, c: 5 } },
+				{ s: { r: 4, c: 0 }, e: { r: 4, c: 5 } },
+				{ s: { r: 5, c: 0 }, e: { r: 5, c: 5 } },
+			];
+
+			const headerStyle = {
+				font: { bold: true, sz: 12 },
+				alignment: { horizontal: "center", vertical: "center" },
+			};
+
+			for (let i = 1; i <= 5; i++) {
+				const cellRef = XLSX.utils.encode_cell({ r: i, c: 0 });
+				if (!ws[cellRef]) ws[cellRef] = {};
+				ws[cellRef].s = headerStyle;
+			}
+
+			XLSX.utils.book_append_sheet(wb, ws, "Items");
+			XLSX.writeFile(
+				wb,
+				`PDRRMO_Equipment_${new Date().toLocaleDateString()}.xlsx`
+			);
+		} catch (error) {
+			console.error("Error generating Excel file:", error);
+			toast.error("Error generating Excel file");
+		}
 	};
 
 	const copyBarcodeToClipboard = (barcode) => {
@@ -157,63 +223,42 @@ const Items = () => {
 		});
 	};
 
-	useEffect(() => {
-		if (items && items.items.length > 0) {
-			const latestItem = items.items[items.items.length - 1];
-			copyBarcodeToClipboard(latestItem.barcode);
-		}
-	}, [items]);
-
 	const handleItemSelect = (itemId) => {
-		setSelectedItems(prev => {
+		setSelectedItems((prev) => {
 			if (prev.includes(itemId)) {
-				return prev.filter(id => id !== itemId);
+				return prev.filter((id) => id !== itemId);
 			} else {
 				return [...prev, itemId];
 			}
 		});
 	};
 
-	const QRDocument = () => (
-		<Document>
-			{chunk(
-				filteredAndSortedItems.filter(item => selectedItems.includes(item.id)),
-				8
-			).map((pageItems, pageIndex) => (
-				<Page key={pageIndex} size="A4" style={styles.page}>
-					{pageItems.map((item, index) => (
-						<View key={index} style={styles.qrContainer}>
-							<PDFImage
-								style={styles.qrCode}
-								src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(
-									item.barcode
-								)}`}
-							/>
-							<Text style={styles.itemName}>{truncateText(item.name, 20)}</Text>
-						</View>
-					))}
-				</Page>
-			))}
-		</Document>
-	);
+	const handleExportPDF = async () => {
+		if (typeof window === "undefined") return;
 
-	const exportQRCodesToPDF = async () => {
-		if (selectedItems.length === 0) {
-			toast.error('Please select items to export');
-			return;
+		try {
+			const { exportQRCodesToPDF } = await import(
+				"../../../components/pdf/PDFExport"
+			);
+			await exportQRCodesToPDF(selectedItems, filteredAndSortedItems);
+		} catch (error) {
+			console.error("Error loading PDF export:", error);
+			toast.error("Failed to load PDF export functionality");
 		}
-
-		const blob = await pdf(<QRDocument />).toBlob();
-		saveAs(blob, "qr-codes.pdf");
 	};
 
-	// Helper function to split array into chunks
-	const chunk = (arr, size) => {
-		const chunks = [];
-		for (let i = 0; i < arr.length; i += size) {
-			chunks.push(arr.slice(i, i + size));
+	const loadMoreItems = () => {
+		if (items?.meta?.hasNextPage) {
+			setPrevCursor(cursor);
+			setCursor(items.meta.nextCursor);
 		}
-		return chunks;
+	};
+
+	const loadPreviousItems = () => {
+		if (prevCursor) {
+			setCursor(prevCursor);
+			setPrevCursor(null);
+		}
 	};
 
 	return (
@@ -256,34 +301,27 @@ const Items = () => {
 					<FaFileExport className="mr-2" />
 					Export to Excel
 				</Button>
-				<Button onClick={exportQRCodesToPDF} color="info">
+				<Button onClick={handleExportPDF} color="info">
 					<FaFileExport className="mr-2" />
 					Export QR Codes
 				</Button>
 			</div>
-			<div className="overflow-x-auto  min-h-[500px]">
+			<div className="overflow-x-auto min-h-[500px]">
 				<Table>
 					<Table.Head>
-						<Table.HeadCell>
-							Select
-						</Table.HeadCell>
+						<Table.HeadCell>Select</Table.HeadCell>
 						<Table.HeadCell onClick={() => handleSort("name")}>
 							Item name
 						</Table.HeadCell>
 						<Table.HeadCell onClick={() => handleSort("category")}>
 							Category
 						</Table.HeadCell>
-						{/* <Table.HeadCell onClick={() => handleSort("quantity")}>
-							Quantity
-						</Table.HeadCell>
-						<Table.HeadCell onClick={() => handleSort("unit")}>
-							Unit
-						</Table.HeadCell> */}
 						<Table.HeadCell onClick={() => handleSort("item_condition")}>
 							Condition
 						</Table.HeadCell>
 						<Table.HeadCell>QR Code</Table.HeadCell>
 						<Table.HeadCell>Images</Table.HeadCell>
+						<Table.HeadCell>Availability</Table.HeadCell>
 						<Table.HeadCell>Actions</Table.HeadCell>
 					</Table.Head>
 					<Table.Body className="divide-y">
@@ -301,6 +339,7 @@ const Items = () => {
 											checked={selectedItems.includes(item.id)}
 											onChange={() => handleItemSelect(item.id)}
 											className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+											disabled={item.item_condition === "Damaged"}
 										/>
 									</Table.Cell>
 									<Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
@@ -309,10 +348,6 @@ const Items = () => {
 										</Tooltip>
 									</Table.Cell>
 									<Table.Cell>{categoriesList[item.category]}</Table.Cell>
-									{/* <Table.Cell>
-										{item.quantity > 0 ? item.quantity : "Out of Stock"}
-									</Table.Cell>
-									<Table.Cell>{item.unit}</Table.Cell> */}
 									<Table.Cell className="w-[20px] text-center">
 										<Badge
 											color={
@@ -352,7 +387,6 @@ const Items = () => {
 														<div ref={barcodeRef} className="bg-white p-4">
 															<QRCodeCanvas
 																value={JSON.stringify(item.barcode)}
-																renderAs="svg"
 																level="M"
 															/>
 														</div>
@@ -386,8 +420,8 @@ const Items = () => {
 											btnSize="sm"
 											headerTitle={item.name}
 											mainContent={
-												<ItemImage
-													imagePath={item?.image_path}
+												<Image
+													src={getImageUrl(item?.image_path)}
 													width={600}
 													height={400}
 													alt="item image"
@@ -395,6 +429,13 @@ const Items = () => {
 												/>
 											}
 										/>
+									</Table.Cell>
+									<Table.Cell className="text-center">
+										{item.item_condition === "Damaged" ? (
+											<span className="text-red-500">Not Available</span>
+										) : (
+											<span className="text-green-500">Available</span>
+										)}
 									</Table.Cell>
 									<Table.Cell className="flex gap-2">
 										<AddItemForm
@@ -437,6 +478,24 @@ const Items = () => {
 							))}
 					</Table.Body>
 				</Table>
+			</div>
+			<div className="flex justify-between">
+				<Button
+					onClick={loadPreviousItems}
+					color="light"
+					disabled={!prevCursor}
+				>
+					<FaChevronLeft className="mr-2" />
+					Previous
+				</Button>
+				<Button
+					onClick={loadMoreItems}
+					color="light"
+					disabled={!items?.meta?.hasNextPage}
+				>
+					Next
+					<FaChevronRight className="ml-2" />
+				</Button>
 			</div>
 		</section>
 	);

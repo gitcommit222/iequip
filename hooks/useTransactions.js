@@ -1,11 +1,27 @@
 import api from "../utils/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-const createTransaction = async ({ recipientInfo, itemInfo }) => {
-	const response = await api.post("/transactions", {
-		recipientInfo,
-		itemInfo,
-	});
+const createTransaction = async ({
+	recipientInfo,
+	itemList,
+	end_date,
+	tested_by,
+	proof_image,
+	returned_condition,
+}) => {
+	// Added returned_condition
+	const formData = new FormData();
+	formData.append("recipientInfo", JSON.stringify(recipientInfo));
+	formData.append("itemList", JSON.stringify(itemList));
+	formData.append("end_date", end_date);
+	formData.append("tested_by", tested_by);
+	formData.append("returned_condition", returned_condition); // Added returned_condition
+
+	if (proof_image) {
+		formData.append("file", proof_image);
+	}
+
+	const response = await api.post("/transactions", formData);
 	return response.data;
 };
 
@@ -83,8 +99,25 @@ export const useGetTransactionById = (transactionId) => {
 };
 
 const deleteTransaction = async (transactionId) => {
-	const response = await api.delete(`/transactions/${transactionId}`);
-	return response.data;
+	try {
+		const response = await api.delete(`/transactions/${transactionId}`);
+		return response.data;
+	} catch (error) {
+		// Handle errors based on the response from the server
+		if (error.response) {
+			// The request was made and the server responded with a status code
+			console.error("Error:", error.response.data.error);
+			throw new Error(error.response.data.error); // Rethrow the error for further handling
+		} else if (error.request) {
+			// The request was made but no response was received
+			console.error("Error: No response received");
+			throw new Error("No response received from the server");
+		} else {
+			// Something happened in setting up the request that triggered an Error
+			console.error("Error:", error.message);
+			throw new Error(error.message);
+		}
+	}
 };
 
 export const useDeleteTransaction = () => {

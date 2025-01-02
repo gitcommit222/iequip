@@ -1,16 +1,18 @@
 import api from "../utils/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-const getItems = async () => {
-	const response = await api.get("/items/");
+const getItems = async (cursor) => {
+	const response = await api.get("/items/", {
+		params: { cursor },
+	});
 
 	return response.data;
 };
 
-export const useGetItems = () => {
+export const useGetItems = (cursor) => {
 	return useQuery({
-		queryKey: ["items"],
-		queryFn: getItems,
+		queryKey: ["items", cursor],
+		queryFn: () => getItems(cursor),
 		onSuccess: (data) => {
 			console.log(data.items);
 		},
@@ -36,7 +38,7 @@ const addItem = async ({ file, itemData }) => {
 	try {
 		const formData = new FormData();
 		if (file) {
-			formData.append("image", file);
+			formData.append("item_picture", file);
 		} else {
 			throw new Error("No file selected");
 		}
@@ -45,6 +47,10 @@ const addItem = async ({ file, itemData }) => {
 			if (itemData.hasOwnProperty(key)) {
 				formData.append(key, itemData[key]);
 			}
+		}
+
+		for (const [key, value] of formData.entries()) {
+			console.log(`${key}:`, value);
 		}
 
 		const response = await api.post("/items/", formData, {
@@ -116,7 +122,7 @@ const updateItem = async ({ file, itemId, newItemData }) => {
 	try {
 		const formData = new FormData();
 		if (file) {
-			formData.append("image", file);
+			formData.append("item_picture", file);
 		}
 		for (const key in newItemData) {
 			if (newItemData.hasOwnProperty(key)) {
@@ -124,7 +130,6 @@ const updateItem = async ({ file, itemId, newItemData }) => {
 			}
 		}
 
-		console.log(file);
 		const response = await api.put(`/items/update/${itemId}`, formData, {
 			headers: {
 				"Content-Type": "multipart/form-data",
