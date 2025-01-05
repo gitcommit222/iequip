@@ -3,7 +3,7 @@ import { View, Text, Image as PDFImage } from "@react-pdf/renderer";
 import { pdfStyles } from "../../styles/pdfStyles";
 import { getExportHeader } from "../../utils/pdfUtils";
 
-export const PDFHeader = () => {
+export default QRPDFHeader = () => {
 	const headerData = getExportHeader();
 	return (
 		<View style={pdfStyles.header}>

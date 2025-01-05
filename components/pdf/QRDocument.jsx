@@ -6,10 +6,10 @@ import {
 	Text,
 	Image as PDFImage,
 } from "@react-pdf/renderer";
-import { PDFHeader } from "./PDFHeader";
 import { pdfStyles } from "../../styles/pdfStyles";
 import { chunk } from "../../utils/pdfUtils";
 import { truncateText } from "../../helpers/truncateText";
+import QRPDFHeader from "./pdfHeader";
 
 const QRDocument = ({ selectedItems, filteredAndSortedItems }) => {
 	return (
@@ -21,7 +21,7 @@ const QRDocument = ({ selectedItems, filteredAndSortedItems }) => {
 				8
 			).map((pageItems, pageIndex) => (
 				<Page key={pageIndex} size="A4" style={pdfStyles.page}>
-					{pageIndex === 0 && <PDFHeader />}
+					{pageIndex === 0 && <QRPDFHeader />}
 					{pageItems.map((item, index) => (
 						<View key={index} style={pdfStyles.qrContainer}>
 							<PDFImage
