@@ -21,6 +21,7 @@ import {
 	FaTrash,
 	FaCheckCircle,
 } from "react-icons/fa";
+import PageTransition from "../../../components/animations/PageTransition";
 
 const GuidesPage = () => {
 	const guides = [
@@ -268,78 +269,79 @@ const GuidesPage = () => {
 				title="System Guide"
 				subtext="Complete documentation for using the GearKeeper system"
 			/>
-
-			<div className="max-w-7xl mx-auto mt-8 space-y-8">
-				{/* Search Bar */}
-				<div className="bg-white rounded-lg shadow-sm p-4">
-					<div className="relative">
-						<FaSearch className="absolute left-3 top-3 text-gray-400" />
-						<input
-							type="text"
-							placeholder="Search guides..."
-							className="w-full p-2 pl-10 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-						/>
+			<PageTransition>
+				<div className="max-w-7xl  mt-8 space-y-8">
+					{/* Search Bar */}
+					<div className="bg-white rounded-lg shadow-sm p-4">
+						<div className="relative">
+							<FaSearch className="absolute left-3 top-3 text-gray-400" />
+							<input
+								type="text"
+								placeholder="Search guides..."
+								className="w-full p-2 pl-10 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+							/>
+						</div>
 					</div>
-				</div>
 
-				{/* Guide Categories */}
-				{guides.map((guide, index) => (
-					<div key={index} className="bg-white rounded-lg shadow-sm">
-						<div className="p-6 border-b border-gray-100">
-							<div className="flex items-center gap-3">
-								{guide.icon}
-								<h2 className="text-2xl font-bold">{guide.title}</h2>
+					{/* Guide Categories */}
+					{guides.map((guide, index) => (
+						<div key={index} className="bg-white rounded-lg shadow-sm">
+							<div className="p-6 border-b border-gray-100">
+								<div className="flex items-center gap-3">
+									{guide.icon}
+									<h2 className="text-2xl font-bold">{guide.title}</h2>
+								</div>
+							</div>
+
+							<div className="grid md:grid-cols-3 gap-6 p-6">
+								{guide.sections.map((section, sectionIndex) => (
+									<div
+										key={sectionIndex}
+										className="p-4 border border-gray-100 rounded-lg hover:bg-blue-50 hover:border-blue-200 transition-all"
+									>
+										<h3 className="font-semibold mb-2 flex items-center gap-2">
+											{section.title}
+										</h3>
+										<p className="text-sm text-gray-600 mb-4">
+											{section.description}
+										</p>
+										<div className="space-y-2">
+											{section.steps.map((step, stepIndex) => (
+												<div
+													key={stepIndex}
+													className="flex items-start gap-2 text-sm"
+												>
+													<div className="min-w-[20px] mt-1">
+														<FaCheckCircle className="text-green-500" />
+													</div>
+													<p>{step}</p>
+												</div>
+											))}
+										</div>
+									</div>
+								))}
 							</div>
 						</div>
+					))}
 
-						<div className="grid md:grid-cols-3 gap-6 p-6">
-							{guide.sections.map((section, sectionIndex) => (
-								<div
-									key={sectionIndex}
-									className="p-4 border border-gray-100 rounded-lg hover:bg-blue-50 hover:border-blue-200 transition-all"
-								>
-									<h3 className="font-semibold mb-2 flex items-center gap-2">
-										{section.title}
-									</h3>
-									<p className="text-sm text-gray-600 mb-4">
-										{section.description}
-									</p>
-									<div className="space-y-2">
-										{section.steps.map((step, stepIndex) => (
-											<div
-												key={stepIndex}
-												className="flex items-start gap-2 text-sm"
-											>
-												<div className="min-w-[20px] mt-1">
-													<FaCheckCircle className="text-green-500" />
-												</div>
-												<p>{step}</p>
-											</div>
-										))}
-									</div>
-								</div>
-							))}
+					{/* Help Section */}
+					{/* <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white">
+						<div className="flex items-center gap-3 mb-3">
+							<FaQuestionCircle className="text-2xl" />
+							<h2 className="text-xl font-bold">Need Additional Help?</h2>
 						</div>
-					</div>
-				))}
-
-				{/* Help Section */}
-				<div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white">
-					<div className="flex items-center gap-3 mb-3">
-						<FaQuestionCircle className="text-2xl" />
-						<h2 className="text-xl font-bold">Need Additional Help?</h2>
-					</div>
-					<p className="mb-4">
-						Can't find what you're looking for? Our support team is here to
-						help!
-					</p>
-					<div className="flex gap-4">
-						<button className="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors">
-							Contact Support
-						</button>
-					</div>
+						<p className="mb-4">
+							Can't find what you're looking for? Our support team is here to
+							help!
+						</p>
+						<div className="flex gap-4">
+							<button className="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors">
+								Contact Support
+							</button>
+						</div>
+					</div> */}
 				</div>
-			</div>
+			</PageTransition>
 		</section>
 	);
 };

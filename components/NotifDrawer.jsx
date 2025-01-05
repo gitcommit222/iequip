@@ -23,8 +23,6 @@ export default function NotifDrawer({ color = "gray" }) {
 		});
 	};
 
-	console.log(notifs);
-
 	return (
 		<>
 			<div className="flex items-center justify-center">
@@ -38,10 +36,7 @@ export default function NotifDrawer({ color = "gray" }) {
 				<Drawer.Header title="Notifications" titleIcon={GoBell} />
 				<div className="flex gap-2 flex-col">
 					{notifs?.map((notif) => (
-						<Drawer.Items
-							className="border p-3 rounded-md"
-							key={notif.Notification.id}
-						>
+						<Drawer.Items className="border p-3 rounded-md" key={notif.id}>
 							<div className="flex justify-between">
 								<h1 className="font-semibold text-[14px] text-gray-700">
 									{notif.Notification.title}

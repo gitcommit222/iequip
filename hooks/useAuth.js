@@ -27,19 +27,32 @@ export const useLogin = () => {
 	});
 };
 
+// Fetch user function
 const fetchUser = async () => {
-	const response = await api.get("/users/me");
-
-	return response.data;
+	try {
+		const response = await api.get("/users/me");
+		return response.data;
+	} catch (error) {
+		if (error.response) {
+			throw new Error(error.response.data.message || "Failed to fetch user");
+		} else if (error.request) {
+			throw new Error("No response from server");
+		} else {
+			throw new Error("Error in fetch user request: " + error.message);
+		}
+	}
 };
 
+// Custom hook for fetching user data
 export const useUser = () => {
 	return useQuery({
-		queryKey: ["user"],
-		queryFn: fetchUser,
-		retry: false,
-		staleTime: Infinity,
-		cacheTime: Infinity,
+		queryKey: ["user"], // Query key to uniquely identify this request
+		queryFn: fetchUser, // Function that fetches the data
+		retry: 1, // Number of retries on failure
+		staleTime: 5000, // Data is considered fresh for 5 seconds
+		refetchOnWindowFocus: false, // Prevent auto refetch when window gains focus
+		cacheTime: 0, // Cache time set to 0 so that we don't have unnecessary cache retention
+		enabled: true, // Ensures the query is always enabled
 	});
 };
 

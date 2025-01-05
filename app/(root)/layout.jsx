@@ -1,7 +1,5 @@
 import Sidebar from "../../components/Sidebar";
-import Footer from "../../components/Footer";
 import ProtectedRoute from "../../hoc/ProtectedRoute";
-import AppBar from "../../components/AppBar";
 
 export default function MainLayout({ children }) {
 	return (

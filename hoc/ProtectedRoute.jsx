@@ -1,30 +1,42 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useUser } from "../hooks/useAuth";
 import toast from "react-hot-toast";
 import Loader from "../components/loader/Loader";
+import { useUser } from "../hooks/useAuth";
 
 const ProtectedRoute = ({ children }) => {
-	const { data: user, isLoading, error, isError } = useUser();
+	const { data: user, isLoading, isError, error } = useUser();
 	const router = useRouter();
+	const [isHydrated, setIsHydrated] = useState(false);
 
 	useEffect(() => {
-		if (!user && !isLoading) {
+		// Prevent React hydration issues
+		setIsHydrated(true);
+	}, []);
+
+	useEffect(() => {
+		if (isError) {
+			toast.error(error?.message || "Something went wrong!");
+		}
+
+		// Redirect to sign-in if no user and not loading
+		if (!isLoading && !user) {
+			toast("Please sign in.", { icon: "😊" });
 			router.push("/sign-in");
 		}
-		if (isError) {
-			toast("Please sign in.", {
-				icon: "😊",
-			});
-		}
-	});
+	}, [user, isLoading, isError, error, router]);
 
-	if (!user && !isLoading) {
+	// Show a loader while the user data is loading or still hydrating
+	if (!isHydrated || isLoading) {
 		return <Loader />;
 	}
 
-	return <>{user && children}</>;
+	if (!user) {
+		return <Loader />;
+	}
+
+	return <>{children}</>;
 };
 
 export default ProtectedRoute;

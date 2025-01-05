@@ -31,6 +31,7 @@ export const useItemImage = (imagePath) => {
 		queryKey: ["itemImage", imagePath],
 		queryFn: () => getItemImage(imagePath),
 		enabled: !!imagePath, // Only run the query if imagePath is provided
+		retry: false,
 	});
 };
 

@@ -104,6 +104,7 @@ const AddItemForm = ({
 					Math.floor(Math.random() * (9999999 - 1000000 + 1)) + 1000000;
 				const barcode = `${itemLetters}${category}${randomNum}`;
 				itemData.barcode = barcode;
+
 				try {
 					await toast.promise(addItemMutation({ file, itemData }), {
 						success: "Item added!",
@@ -117,7 +118,6 @@ const AddItemForm = ({
 			} else {
 				try {
 					const fileToUpdate = file instanceof File ? file : undefined;
-
 
 					await toast.promise(
 						updateItem({
@@ -305,7 +305,9 @@ const AddItemForm = ({
 								type="date"
 								name="datePurchase"
 								color={`${errors.datePurchase ? "failure" : "gray"}`}
-								helperText={errors.datePurchase ? errors.datePurchase.message : ""}
+								helperText={
+									errors.datePurchase ? errors.datePurchase.message : ""
+								}
 							/>
 						</div>
 						<div className="flex gap-3">

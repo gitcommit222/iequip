@@ -18,6 +18,7 @@ import {
 import CustomModal from "../../../components/shared/CustomModal";
 import toast from "react-hot-toast";
 import LogsTable from "../../../components/LogsTable";
+import PageTransition from "../../../components/animations/PageTransition";
 
 const User = () => {
 	const { data: users } = useUsers();
@@ -169,92 +170,94 @@ const User = () => {
 	return (
 		<section>
 			<Headerbox title="Users" subtext="View and manage users data here." />
-			<div className=" h-screen">
-				<Tabs aria-label="Tabs with icons" variant="default" color="success">
-					<Tabs.Item active title="Users" icon={FaUsersCog}>
-						<div className="mb-4">
-							<CustomModal
-								btnTitle="Add New User"
-								headerTitle="Create New User"
-								mainContent={addUserForm}
-								btnColor="success"
-							/>
-						</div>
-						<Table>
-							<Table.Head>
-								<Table.HeadCell>Name</Table.HeadCell>
-								<Table.HeadCell>Email</Table.HeadCell>
-								<Table.HeadCell>Actions</Table.HeadCell>
-							</Table.Head>
-							<Table.Body>
-								{users &&
-									users.map((user) => (
-										<Table.Row key={user.id}>
-											<Table.Cell>{user.name}</Table.Cell>
-											<Table.Cell>{user.email}</Table.Cell>
-
-											<Table.Cell>
-												<button
-													onClick={() => handleDeleteUser(user.id)}
-													className="text-red-500 ml-2 disabled:cursor-not-allowed disabled:text-gray-400"
-													disabled={user?.id === currentUser?.fetchedUser?.id}
-												>
-													Delete
-												</button>
-											</Table.Cell>
-										</Table.Row>
-									))}
-							</Table.Body>
-						</Table>
-					</Tabs.Item>
-					<Tabs.Item active title="Profile" icon={HiUserCircle}>
-						<form className="p-4 bg-white rounded shadow-md">
+			<PageTransition>
+				<div className=" h-screen">
+					<Tabs aria-label="Tabs with icons" variant="default" color="success">
+						<Tabs.Item active title="Users" icon={FaUsersCog}>
 							<div className="mb-4">
-								<label className="block text-gray-700">Name:</label>
-								<input
-									type="text"
-									value={name}
-									onChange={(e) => setName(e.target.value)}
-									className="border rounded w-full p-2 mt-1"
-								/>
-							</div>
-							<div className="mb-4">
-								<label className="block text-gray-700">Email:</label>
-								<input
-									type="email"
-									value={email}
-									onChange={(e) => setEmail(e.target.value)}
-									className="border rounded w-full p-2 mt-1"
-								/>
-							</div>
-							<div className="mt-4 flex space-x-2">
-								<button
-									onClick={handleUpdateUser}
-									className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
-									disabled={!isChanged}
-								>
-									Edit
-								</button>
-								<button
-									type="button"
-									className="bg-gray-300 text-gray-700 rounded px-4 py-2 hover:bg-gray-400"
-								>
-									Reset
-								</button>
 								<CustomModal
-									btnTitle="Change Password"
-									headerTitle="Change Password"
-									mainContent={passwordChangeForm}
+									btnTitle="Add New User"
+									headerTitle="Create New User"
+									mainContent={addUserForm}
 									btnColor="success"
 								/>
 							</div>
-						</form>
-					</Tabs.Item>
-					<Tabs.Item title="Logs" icon={TbLogs}>
-						<LogsTable />
-					</Tabs.Item>
-				</Tabs>
-			</div>
+							<Table>
+								<Table.Head>
+									<Table.HeadCell>Name</Table.HeadCell>
+									<Table.HeadCell>Email</Table.HeadCell>
+									<Table.HeadCell>Actions</Table.HeadCell>
+								</Table.Head>
+								<Table.Body>
+									{users &&
+										users.map((user) => (
+											<Table.Row key={user.id}>
+												<Table.Cell>{user.name}</Table.Cell>
+												<Table.Cell>{user.email}</Table.Cell>
+
+												<Table.Cell>
+													<button
+														onClick={() => handleDeleteUser(user.id)}
+														className="text-red-500 ml-2 disabled:cursor-not-allowed disabled:text-gray-400"
+														disabled={user?.id === currentUser?.fetchedUser?.id}
+													>
+														Delete
+													</button>
+												</Table.Cell>
+											</Table.Row>
+										))}
+								</Table.Body>
+							</Table>
+						</Tabs.Item>
+						<Tabs.Item active title="Profile" icon={HiUserCircle}>
+							<form className="p-4 bg-white rounded shadow-md">
+								<div className="mb-4">
+									<label className="block text-gray-700">Name:</label>
+									<input
+										type="text"
+										value={name}
+										onChange={(e) => setName(e.target.value)}
+										className="border rounded w-full p-2 mt-1"
+									/>
+								</div>
+								<div className="mb-4">
+									<label className="block text-gray-700">Email:</label>
+									<input
+										type="email"
+										value={email}
+										onChange={(e) => setEmail(e.target.value)}
+										className="border rounded w-full p-2 mt-1"
+									/>
+								</div>
+								<div className="mt-4 flex space-x-2">
+									<button
+										onClick={handleUpdateUser}
+										className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+										disabled={!isChanged}
+									>
+										Edit
+									</button>
+									<button
+										type="button"
+										className="bg-gray-300 text-gray-700 rounded px-4 py-2 hover:bg-gray-400"
+									>
+										Reset
+									</button>
+									<CustomModal
+										btnTitle="Change Password"
+										headerTitle="Change Password"
+										mainContent={passwordChangeForm}
+										btnColor="success"
+									/>
+								</div>
+							</form>
+						</Tabs.Item>
+						<Tabs.Item title="Logs" icon={TbLogs}>
+							<LogsTable />
+						</Tabs.Item>
+					</Tabs>
+				</div>
+			</PageTransition>
 		</section>
 	);
 };

@@ -21,6 +21,7 @@ import QRCodeScanner from "../components/QRScanner";
 import { useUser } from "../hooks/useAuth";
 import Image from "next/image";
 import { getImageUrl } from "../utils/imageUtils";
+import PageTransition from "./animations/PageTransition";
 
 const BorrowItemForm = ({ data }) => {
 	const [openModal, setOpenModal] = useState(false);
@@ -326,7 +327,7 @@ const BorrowItemForm = ({ data }) => {
 	];
 
 	return (
-		<>
+		<PageTransition>
 			<Button color="success" pill size="sm" onClick={() => setOpenModal(true)}>
 				Borrow
 			</Button>
@@ -682,7 +683,7 @@ const BorrowItemForm = ({ data }) => {
 					<QRCodeScanner onScanned={handleOnScanned} />
 				</Modal.Body>
 			</Modal>
-		</>
+		</PageTransition>
 	);
 };
 
