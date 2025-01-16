@@ -470,11 +470,15 @@ const Items = () => {
 									<Table.Row
 										key={item?.id}
 										className={`bg-white dark:border-gray-700 dark:bg-gray-800 disabled:opacity-50 ${
-											item.quantity === 0
+											item?.item_condition === "Damaged" ||
+											item.status === "borrowed"
 												? "opacity-50 pointer-events-none"
 												: ""
 										}`}
-										aria-disabled={item?.item_condition === "damaged"}
+										aria-disabled={
+											item?.item_condition === "Damaged" ||
+											item.status === "borrowed"
+										}
 									>
 										<Table.Cell>
 											<input
