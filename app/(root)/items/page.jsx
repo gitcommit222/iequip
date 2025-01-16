@@ -573,7 +573,7 @@ const Items = () => {
 												}
 											/>
 										</Table.Cell>
-										<Table.Cell className="text-center">
+										<Table.Cell>
 											{item.item_condition === "Damaged" ||
 											item.status === "borrowed" ? (
 												<span className="text-red-500">Not Available</span>
