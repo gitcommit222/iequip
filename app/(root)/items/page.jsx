@@ -469,11 +469,12 @@ const Items = () => {
 								filteredAndSortedItems.map((item) => (
 									<Table.Row
 										key={item?.id}
-										className={`bg-white dark:border-gray-700 dark:bg-gray-800 ${
+										className={`bg-white dark:border-gray-700 dark:bg-gray-800 disabled:opacity-50 ${
 											item.quantity === 0
 												? "opacity-50 pointer-events-none"
 												: ""
 										}`}
+										aria-disabled={item?.item_condition === "damaged"}
 									>
 										<Table.Cell>
 											<input
@@ -573,7 +574,8 @@ const Items = () => {
 											/>
 										</Table.Cell>
 										<Table.Cell className="text-center">
-											{item.item_condition === "Damaged" ? (
+											{item.item_condition === "Damaged" ||
+											item.status === "borrowed" ? (
 												<span className="text-red-500">Not Available</span>
 											) : (
 												<span className="text-green-500">Available</span>
