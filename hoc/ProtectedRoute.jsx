@@ -16,13 +16,8 @@ const ProtectedRoute = ({ children }) => {
 	}, []);
 
 	useEffect(() => {
-		if (isError) {
-			toast.error(error?.message || "Something went wrong!");
-		}
-
 		// Redirect to sign-in if no user and not loading
 		if (!isLoading && !user) {
-			toast("Please sign in.", { icon: "😊" });
 			router.push("/sign-in");
 		}
 	}, [user, isLoading, isError, error, router]);
