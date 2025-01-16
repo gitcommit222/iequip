@@ -515,6 +515,10 @@ const Items = () => {
 															size="xs"
 															color="gray"
 															onClick={downloadBarcode}
+															disabled={
+																item.item_condition === "Damaged" ||
+																item.status === "borrowed"
+															}
 														>
 															<Image
 																src={saveBtn}
@@ -551,6 +555,10 @@ const Items = () => {
 													color="gray"
 													onClick={() => copyBarcodeToClipboard(item.barcode)}
 													title="Copy QR Code value to clipboard"
+													disabled={
+														item.item_condition === "Damaged" ||
+														item.status === "borrowed"
+													}
 												>
 													<FaCopy size={15} />
 												</Button>
