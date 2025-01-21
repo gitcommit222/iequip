@@ -40,13 +40,15 @@ export const useGetGoodsZeroQuantity = () => {
 
 const createGoods = async (goodsData) => {
 	const formData = new FormData();
-	for (const key in goodsData) {
-		if (key === "file" && goodsData[key][0]) {
-			formData.append("item_picture", goodsData[key][0]);
-		} else {
-			formData.append(key, goodsData[key]);
-		}
+	if (goodsData.file) {
+		formData.append("file", goodsData.file);
 	}
+	for (const key in goodsData) {
+		formData.append(key, goodsData[key]);
+	}
+
+	console.log(Object.fromEntries(formData.entries()));
+
 	const response = await api.post("/goods", formData, {
 		headers: { "Content-Type": "multipart/form-data" },
 	});
