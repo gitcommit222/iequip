@@ -219,6 +219,17 @@ const AddSupplyForm = ({
 						</div>
 						<div>
 							<div className="mb-2 block">
+								<Label htmlFor="expiration_date" value="Expiration Date" />
+								<input
+									{...register("expiration_date")}
+									id="expiration_date"
+									name="expiration_date"
+									type="date"
+								/>
+							</div>
+						</div>
+						<div>
+							<div className="mb-2 block">
 								<Label htmlFor="purchase_date" value="Purchase Date" />
 								<input
 									{...register("purchase_date")}
