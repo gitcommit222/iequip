@@ -39,6 +39,7 @@ const BorrowItemForm = ({ data }) => {
 		handleSubmit,
 		reset,
 		setError,
+		trigger,
 		watch,
 		setValue,
 		formState: { errors, isSubmitting },
@@ -71,6 +72,7 @@ const BorrowItemForm = ({ data }) => {
 
 	useEffect(() => {
 		if (watchedBarcode?.length >= 11) {
+			trigger("itemBarcode");
 			const fetchItem = async () => {
 				try {
 					await refetchItemByBarcode();
