@@ -59,6 +59,7 @@ const AddSupplyForm = ({
 			category: data ? data.category : "",
 			file: data ? data.image_path : "",
 			expiration_date: data ? data.expiration_date : "",
+			purchase_date: data ? data.purchase_date : "",
 		},
 		resolver: yupResolver(addSupplyFormSchema),
 	});
@@ -218,11 +219,11 @@ const AddSupplyForm = ({
 						</div>
 						<div>
 							<div className="mb-2 block">
-								<Label htmlFor="expiration_date" value="Expiration Date" />
+								<Label htmlFor="purchase_date" value="Purchase Date" />
 								<input
-									{...register("expiration_date")}
-									id="expiration_date"
-									name="expiration_date"
+									{...register("purchase_date")}
+									id="purchase_date"
+									name="purchase_date"
 									type="date"
 								/>
 							</div>
