@@ -63,10 +63,24 @@ const BorrowItemForm = ({ data }) => {
 
 	const {
 		data: itemWithBarcode,
-		isLoading: isItemLoading,
+		isFetching: isItemFetching,
 		isError: isItemError,
 		error: itemError,
+		refetch: refetchItemByBarcode,
 	} = useGetItemByBarcode(watchedBarcode?.length >= 11 ? watchedBarcode : null);
+
+	useEffect(() => {
+		if (watchedBarcode?.length >= 11) {
+			const fetchItem = async () => {
+				try {
+					await refetchItemByBarcode();
+				} catch (error) {
+					console.error("Error fetching item by barcode", error);
+				}
+			};
+			fetchItem();
+		}
+	}, [watchedBarcode, refetchItemByBarcode]);
 
 	const addItem = (barcode, quantity = 1) => {
 		if (itemWithBarcode) {
@@ -89,8 +103,11 @@ const BorrowItemForm = ({ data }) => {
 				},
 			]);
 
+			// Reset barcode
 			setBarcode("");
 			setValue("itemBarcode", "");
+		} else {
+			toast.error("No item found with this barcode");
 		}
 	};
 
