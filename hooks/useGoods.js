@@ -42,7 +42,7 @@ const createGoods = async (goodsData) => {
 	const formData = new FormData();
 	for (const key in goodsData) {
 		if (key === "file" && goodsData[key][0]) {
-			formData.append("file", goodsData[key][0]);
+			formData.append("item_picture", goodsData[key][0]);
 		} else {
 			formData.append(key, goodsData[key]);
 		}
