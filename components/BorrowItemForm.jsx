@@ -70,20 +70,6 @@ const BorrowItemForm = ({ data }) => {
 		refetch: refetchItemByBarcode,
 	} = useGetItemByBarcode(watchedBarcode?.length >= 11 ? watchedBarcode : null);
 
-	useEffect(() => {
-		if (watchedBarcode?.length >= 11) {
-			trigger("itemBarcode");
-			const fetchItem = async () => {
-				try {
-					await refetchItemByBarcode();
-				} catch (error) {
-					console.error("Error fetching item by barcode", error);
-				}
-			};
-			fetchItem();
-		}
-	}, [watchedBarcode, refetchItemByBarcode]);
-
 	const addItem = (barcode, quantity = 1) => {
 		if (itemWithBarcode) {
 			const existingItem = items.find((item) => item.barcode === barcode);
