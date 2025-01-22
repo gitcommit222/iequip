@@ -4,7 +4,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 const createSupplyTransaction = async (supplyTransactionData) => {
 	const response = await api.post(
 		"/supply-transactions",
-		supplyTransactionData
+		supplyTransactionData,
+		{
+			headers: {
+				"Content-Type": "multipart/form-data",
+			},
+		}
 	);
 	return response.data;
 };

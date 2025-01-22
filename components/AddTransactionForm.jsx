@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button, Modal, Label, TextInput, Select } from "flowbite-react";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
@@ -14,6 +14,7 @@ const AddTransactionForm = ({
 	onClose,
 }) => {
 	const { data: user } = useUser();
+	const [proofImage, setProofImage] = useState(null);
 
 	const {
 		register,
@@ -41,6 +42,7 @@ const AddTransactionForm = ({
 
 	const onSubmit = async (data) => {
 		try {
+			data.file = proofImage;
 			await toast.promise(createSupplyTransaction(data), {
 				loading: "Creating transaction...",
 				success: "Transaction created successfully",
@@ -336,6 +338,21 @@ const AddTransactionForm = ({
 										type="text"
 										color={errors.remarks ? "failure" : "gray"}
 										helperText={errors.remarks?.message}
+									/>
+								</div>
+								<div className="mb-2">
+									<div className="mb-1 block">
+										<Label
+											htmlFor="signature"
+											value="Proof of Transaction Image"
+										/>
+									</div>
+									<input
+										type="file"
+										id="signature"
+										accept="image/*"
+										onChange={(e) => setProofImage(e.target.files[0])}
+										className="border rounded p-2"
 									/>
 								</div>
 								<div className="field-container space-y-3 border rounded-lg p-4 bg-gray-50">
