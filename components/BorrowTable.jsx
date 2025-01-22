@@ -60,12 +60,10 @@ const BorrowTable = () => {
 						.includes(searchTerm.toLowerCase()) ||
 					item.item?.name.toLowerCase().includes(searchTerm.toLowerCase());
 
-				const matchesStatus =
-					statusFilter === "all" ||
-					(statusFilter === "borrowed" && item.item.status !== "available") ||
-					(statusFilter === "available" && item.item.status === "available") ||
-					(statusFilter === "lost" && item.item.status === "lost");
+				console.log(item.t_status);
 
+				const matchesStatus =
+					statusFilter === "all" || statusFilter === item.t_status;
 				return matchesSearch && matchesStatus;
 			})
 			.sort((a, b) => {
@@ -112,8 +110,7 @@ const BorrowTable = () => {
 					>
 						<option value="all">All Status</option>
 						<option value="borrowed">Borrowed</option>
-						<option value="available">Returned</option>
-						<option value="lost">Lost</option>
+						<option value="returned">Returned</option>
 					</Select>
 					<Button onClick={toggleSortOrder} color="light">
 						{sortOrder === "asc" ? (

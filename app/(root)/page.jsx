@@ -18,6 +18,8 @@ const Home = () => {
 	const { data: transactions, isLoading: isTransactionsLoading } =
 		useGetTransactionsByCategory("items");
 
+	console.log(items);
+
 	const totalItems = items && items?.data?.length;
 
 	const totalBorrowedItems =
@@ -46,10 +48,12 @@ const Home = () => {
 				itemId,
 				count,
 				itemName:
-					items?.data.find((item) => item.id === itemId)?.itemName ||
+					items?.data.find((item) => item.id === parseInt(itemId))?.name ||
 					"Unknown Item",
 			}))
 			.sort((a, b) => b.count - a.count);
+
+		console.log(frequentlyBorrowedItems);
 
 		return frequentlyBorrowedItems;
 	};
