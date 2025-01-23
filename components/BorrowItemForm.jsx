@@ -68,7 +68,7 @@ const BorrowItemForm = ({ data }) => {
 		isError: isItemError,
 		error: itemError,
 		refetch: refetchItemByBarcode,
-	} = useGetItemByBarcode(watchedBarcode ? watchedBarcode : null);
+	} = useGetItemByBarcode(barcode ? barcode : null);
 
 	const addItem = (barcode, quantity = 1) => {
 		if (itemWithBarcode) {
