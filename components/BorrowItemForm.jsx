@@ -68,7 +68,7 @@ const BorrowItemForm = ({ data }) => {
 		isError: isItemError,
 		error: itemError,
 		refetch: refetchItemByBarcode,
-	} = useGetItemByBarcode(watchedBarcode?.length >= 11 ? watchedBarcode : null);
+	} = useGetItemByBarcode(watchedBarcode ? watchedBarcode : null);
 
 	const addItem = (barcode, quantity = 1) => {
 		if (itemWithBarcode) {
@@ -111,7 +111,6 @@ const BorrowItemForm = ({ data }) => {
 				return;
 			}
 
-			// Prepare the data according to controller expectations
 			const submissionData = {
 				recipientInfo: {
 					name: formData.fullName,
@@ -127,7 +126,6 @@ const BorrowItemForm = ({ data }) => {
 				proof_image: proofImage,
 			};
 
-			// Submit using mutation
 			await toast.promise(borrowItemMutation.mutateAsync(submissionData), {
 				loading: "Submitting...",
 				success: "Submitted successfully!",
@@ -141,7 +139,6 @@ const BorrowItemForm = ({ data }) => {
 				}
 			}
 
-			// Reset form and close modal on success
 			reset();
 			setItems([]);
 			setBarcode("");
@@ -488,7 +485,9 @@ const BorrowItemForm = ({ data }) => {
 													placeholder={`${barcode || "e.g. ITE12312312"}`}
 													name="itemBarcode"
 													color={`${errors.itemBarcode ? "failure" : "gray"}`}
-													onChange={(e) => setBarcode(e.target.value)}
+													onChange={(e) =>
+														setBarcode(e.target.value.replace(/@/g, ""))
+													}
 													helperText={
 														errors.itemBarcode ? errors.itemBarcode.message : ""
 													}
