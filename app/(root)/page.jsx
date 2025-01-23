@@ -7,10 +7,17 @@ import PieChart from "../../components/PieChart";
 import { useGetItems } from "../../hooks/useItem";
 import { useFetchBorrowedItems } from "../../hooks/useBorrowItem";
 import NotifDrawer from "../../components/NotifDrawer";
-import { borrowedItem, item, lostItem, returnedItem } from "../../public";
+import {
+	borrowedItem,
+	goods,
+	item,
+	lostItem,
+	returnedItem,
+} from "../../public";
 import { useGetTransactionsByCategory } from "../../hooks/useTransactions";
 import { useUser } from "../../hooks/useAuth";
 import PageTransition from "../../components/animations/PageTransition";
+import { useGetGoods } from "../../hooks/useGoods";
 
 const Home = () => {
 	const { data: items, isLoading } = useGetItems();
@@ -18,7 +25,9 @@ const Home = () => {
 	const { data: transactions, isLoading: isTransactionsLoading } =
 		useGetTransactionsByCategory("items");
 
-	console.log(items);
+	const { data: goodsData, isLoading: isGoodsLoading } = useGetGoods();
+
+	const totalGoods = goodsData && goodsData?.data.length;
 
 	const totalItems = items && items?.data?.length;
 
@@ -30,20 +39,19 @@ const Home = () => {
 		transactions &&
 		transactions?.data.filter((t) => t.t_status === "returned")?.length;
 
-	// Calculate most borrowed items (3 or more times)
 	const getMostBorrowedItems = () => {
 		if (!transactions?.data) return [];
 
-		// Count occurrences of each item
 		const itemCounts = transactions?.data.reduce((acc, transaction) => {
 			const itemId = transaction.item_id;
 			acc[itemId] = (acc[itemId] || 0) + 1;
 			return acc;
 		}, {});
 
-		// Filter items borrowed 3 or more times
+		console.log(itemCounts);
+
 		const frequentlyBorrowedItems = Object.entries(itemCounts)
-			.filter(([_, count]) => count >= 3)
+			.filter(([_, count]) => count >= 1)
 			.map(([itemId, count]) => ({
 				itemId,
 				count,
@@ -53,7 +61,7 @@ const Home = () => {
 			}))
 			.sort((a, b) => b.count - a.count);
 
-		console.log(frequentlyBorrowedItems);
+		// console.log(frequentlyBorrowedItems);
 
 		return frequentlyBorrowedItems;
 	};
@@ -76,12 +84,17 @@ const Home = () => {
 				<div className="space-y-6">
 					<div className="flex gap-4 flex-wrap">
 						<InfoBox
+							title="Total Supplies"
+							data={isLoading ? "..." : totalGoods || 0}
+							iconUrl={goods}
+						/>
+						<InfoBox
 							title="Total Items"
 							data={isLoading ? "..." : totalItems || 0}
 							iconUrl={item}
 						/>
 						<InfoBox
-							title="Borrowed Items"
+							title="Current Borrowed Items"
 							data={isTransactionsLoading ? "..." : totalBorrowedItems || 0}
 							iconUrl={borrowedItem}
 						/>

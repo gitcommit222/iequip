@@ -123,7 +123,6 @@ const SupplyTransactions = () => {
 				});
 			}
 
-			// Add empty rows for spacing before footer
 			worksheet.addRow([]);
 			worksheet.addRow([]);
 
