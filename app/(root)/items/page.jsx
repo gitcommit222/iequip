@@ -30,10 +30,8 @@ import CustomModal from "../../../components/shared/CustomModal";
 import { truncateText } from "../../../helpers/truncateText";
 import toast from "react-hot-toast";
 import { categoriesList } from "../../../lib/categories";
-import * as XLSX from "xlsx";
-import ItemImage from "../../../components/ItemImage";
 import Headerbox from "../../../components/shared/Headerbox";
-import QRCode, { QRCodeCanvas } from "qrcode.react";
+import { QRCodeCanvas } from "qrcode.react";
 import { getImageUrl } from "../../../utils/imageUtils";
 import { format } from "date-fns";
 import MiniLoader from "../../../components/loader/miniLoader";
@@ -52,7 +50,10 @@ const Items = () => {
 	const [prevCursor, setPrevCursor] = useState(null);
 
 	const { mutateAsync: deleteItem } = useDeleteItems();
-	const { data: items, isLoading: isItemLoading } = useGetItems(cursor);
+	const { data: items, isLoading: isItemLoading } = useGetItems(
+		cursor,
+		categoryFilter
+	);
 
 	const handleDeleteItem = (itemId) => {
 		toast.promise(deleteItem(itemId), {

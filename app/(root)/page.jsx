@@ -48,8 +48,6 @@ const Home = () => {
 			return acc;
 		}, {});
 
-		console.log(itemCounts);
-
 		const frequentlyBorrowedItems = Object.entries(itemCounts)
 			.filter(([_, count]) => count >= 3)
 			.map(([itemId, count]) => ({
