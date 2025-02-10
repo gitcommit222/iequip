@@ -14,6 +14,7 @@ export const useGetItems = (cursor) => {
 		onSuccess: (data) => {
 			console.log(data.items);
 		},
+		enabled: !!cursor,
 	});
 };
 
