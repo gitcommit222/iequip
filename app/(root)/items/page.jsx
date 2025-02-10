@@ -50,10 +50,7 @@ const Items = () => {
 	const [prevCursor, setPrevCursor] = useState(null);
 
 	const { mutateAsync: deleteItem } = useDeleteItems();
-	const { data: items, isLoading: isItemLoading } = useGetItems(
-		cursor,
-		categoryFilter
-	);
+	const { data: items, isLoading: isItemLoading } = useGetItems(cursor);
 
 	const handleDeleteItem = (itemId) => {
 		toast.promise(deleteItem(itemId), {
