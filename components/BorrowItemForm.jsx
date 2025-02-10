@@ -60,8 +60,6 @@ const BorrowItemForm = ({ data }) => {
 		resolver: yupResolver(BorrowItemSchema),
 	});
 
-	const watchedBarcode = watch("itemBarcode");
-
 	const {
 		data: itemWithBarcode,
 		isFetching: isItemFetching,
@@ -486,7 +484,7 @@ const BorrowItemForm = ({ data }) => {
 													name="itemBarcode"
 													color={`${errors.itemBarcode ? "failure" : "gray"}`}
 													onChange={(e) =>
-														setBarcode(e.target.value.replace(/@/g, ""))
+														setBarcode(e.target.value.replace(/"/g, ""))
 													}
 													helperText={
 														errors.itemBarcode ? errors.itemBarcode.message : ""
