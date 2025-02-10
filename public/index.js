@@ -1,4 +1,4 @@
-import logo from "./images/gearkeeper.png";
+import logo from "./images/logo.png";
 import logox from "./images/LOGOX.png";
 import signout from "./icons/right-from-bracket-solid.svg";
 
