@@ -4,7 +4,7 @@ import HeaderBox from "../../components/shared/Headerbox";
 import InfoBox from "../../components/InfoBox";
 import BarChart from "../../components/BarChart";
 import PieChart from "../../components/PieChart";
-import { useGetItems } from "../../hooks/useItem";
+import { useGetAllItems, useGetItems } from "../../hooks/useItem";
 import { useFetchBorrowedItems } from "../../hooks/useBorrowItem";
 import NotifDrawer from "../../components/NotifDrawer";
 import {
@@ -20,7 +20,7 @@ import PageTransition from "../../components/animations/PageTransition";
 import { useGetGoods } from "../../hooks/useGoods";
 
 const Home = () => {
-	const { data: items, isLoading } = useGetItems();
+	const { data: items, isLoading } = useGetAllItems();
 	const { data: currentUser } = useUser();
 	const { data: transactions, isLoading: isTransactionsLoading } =
 		useGetTransactionsByCategory("items");

@@ -18,6 +18,19 @@ export const useGetItems = (cursor) => {
 	});
 };
 
+const getAllItems = async () => {
+	const response = await api.get(`/items?limit=1000&cursor=null`);
+	return response.data;
+};
+
+export const useGetAllItems = () => {
+	return useQuery({
+		queryKey: ["allItems"],
+		queryFn: getAllItems,
+		retry: false,
+	});
+};
+
 const getItemImage = async (filename) => {
 	const response = await api.get(`/items/images/${filename}`, {
 		responseType: "blob",
@@ -71,7 +84,7 @@ export const useAddItem = () => {
 	return useMutation({
 		mutationFn: addItem,
 		onSuccess: () => {
-			queryClient.invalidateQueries(["items"]);
+			queryClient.invalidateQueries({ queryKey: ["items", "allItems"] });
 		},
 		onError: (error) => {
 			console.error("Upload failed:", error);
@@ -90,7 +103,7 @@ export const useDeleteItems = () => {
 	return useMutation({
 		mutationFn: deleteItem,
 		onSuccess: () => {
-			queryClient.invalidateQueries(["items"]);
+			queryClient.invalidateQueries({ queryKey: ["items", "allItems"] });
 		},
 		onError: (error) => {
 			console.error("Upload failed:", error);
