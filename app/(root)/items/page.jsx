@@ -643,7 +643,7 @@ const Items = () => {
 					<Button
 						onClick={loadPreviousItems}
 						color="light"
-						disabled={!prevCursor}
+						disabled={cursorStack.length === 0}
 					>
 						<FaChevronLeft className="mr-2" />
 						Previous
