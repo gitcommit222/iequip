@@ -48,6 +48,7 @@ const Items = () => {
 	const [selectedItems, setSelectedItems] = useState([]);
 	const [cursor, setCursor] = useState(null);
 	const [prevCursor, setPrevCursor] = useState(null);
+	const [cursorStack, setCursorStack] = useState([]);
 
 	const { mutateAsync: deleteItem } = useDeleteItems();
 	const { data: items, isLoading: isItemLoading } = useGetItems(cursor);
@@ -380,15 +381,16 @@ const Items = () => {
 
 	const loadMoreItems = () => {
 		if (items?.meta?.hasNextPage) {
-			setPrevCursor(cursor);
+			setCursorStack((prev) => [...prev, cursor]);
 			setCursor(items.meta.nextCursor);
 		}
 	};
 
 	const loadPreviousItems = () => {
-		if (prevCursor) {
-			setCursor(prevCursor);
-			setPrevCursor(null);
+		if (cursorStack.length > 0) {
+			const lastCursor = cursorStack.pop();
+			setCursorStack([...cursorStack]);
+			setCursor(lastCursor);
 		}
 	};
 
