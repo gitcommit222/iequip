@@ -2,7 +2,7 @@ import api from "../utils/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const getItems = async (cursor) => {
-	const response = await api.get(`items?limit=5&cursor=${cursor}`);
+	const response = await api.get(`items?limit=10&cursor=${cursor}`);
 
 	return response.data;
 };
