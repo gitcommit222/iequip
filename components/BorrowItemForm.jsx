@@ -326,6 +326,12 @@ const BorrowItemForm = ({ data }) => {
 		{ value: "SANTA_CRUZ_SAN_VICENTE", label: "San Vicente, Santa Cruz" },
 	];
 
+	const handleKeyPress = (e) => {
+		if (e.key === "Enter") {
+			e.preventDefault(); // Prevents form submission or any auto action
+		}
+	};
+
 	return (
 		<PageTransition>
 			<Button color="success" pill size="sm" onClick={() => setOpenModal(true)}>
@@ -486,6 +492,7 @@ const BorrowItemForm = ({ data }) => {
 													onChange={(e) =>
 														setBarcode(e.target.value.replace(/"/g, ""))
 													}
+													onKeyDown={handleKeyPress}
 													helperText={
 														errors.itemBarcode ? errors.itemBarcode.message : ""
 													}
@@ -498,6 +505,7 @@ const BorrowItemForm = ({ data }) => {
 															addItem(barcode);
 														}
 													}}
+													disabled={!itemWithBarcode}
 													color="gray"
 												>
 													Add Item
