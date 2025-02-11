@@ -20,18 +20,36 @@ ChartJS.register(
 );
 
 const BarChart = ({ data }) => {
+	// Array of pleasant colors for the bars
+	const colors = [
+		"rgba(53, 162, 235, 0.7)", // Blue
+		"rgba(255, 99, 132, 0.7)", // Pink
+		"rgba(75, 192, 192, 0.7)", // Teal
+		"rgba(255, 159, 64, 0.7)", // Orange
+		"rgba(153, 102, 255, 0.7)", // Purple
+		"rgba(255, 205, 86, 0.7)", // Yellow
+		"rgba(54, 162, 235, 0.7)", // Light blue
+		"rgba(255, 99, 255, 0.7)", // Magenta
+		"rgba(76, 175, 80, 0.7)", // Green
+		"rgba(255, 82, 82, 0.7)", // Red
+	];
+
+	const borderColors = colors.map((color) => color.replace("0.7)", "1)"));
+
 	const chartData = {
 		labels: data.map((item) => item.itemName),
 		datasets: [
 			{
 				label: "Times Borrowed",
 				data: data.map((item) => item.count),
-				backgroundColor: "rgba(53, 162, 235, 0.7)",
-				borderColor: "rgba(53, 162, 235, 1)",
+				backgroundColor: data.map((_, index) => colors[index % colors.length]),
+				borderColor: data.map(
+					(_, index) => borderColors[index % borderColors.length]
+				),
 				borderWidth: 1,
 				borderRadius: 4,
-				barThickness: 30, // Makes bars thinner
-				maxBarThickness: 35, // Ensures bars don't get too thick
+				barThickness: 30,
+				maxBarThickness: 35,
 			},
 		],
 	};
