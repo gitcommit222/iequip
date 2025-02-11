@@ -3,17 +3,9 @@ import React, { Suspense } from "react";
 import HeaderBox from "../../components/shared/Headerbox";
 import InfoBox from "../../components/InfoBox";
 import BarChart from "../../components/BarChart";
-import PieChart from "../../components/PieChart";
-import { useGetAllItems, useGetItems } from "../../hooks/useItem";
-import { useFetchBorrowedItems } from "../../hooks/useBorrowItem";
+import { useGetAllItems } from "../../hooks/useItem";
 import NotifDrawer from "../../components/NotifDrawer";
-import {
-	borrowedItem,
-	goods,
-	item,
-	lostItem,
-	returnedItem,
-} from "../../public";
+import { borrowedItem, goods, item, returnedItem } from "../../public";
 import { useGetTransactionsByCategory } from "../../hooks/useTransactions";
 import { useUser } from "../../hooks/useAuth";
 import PageTransition from "../../components/animations/PageTransition";
