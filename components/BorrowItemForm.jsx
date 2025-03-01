@@ -23,6 +23,8 @@ import Image from "next/image";
 import { getImageUrl } from "../utils/imageUtils";
 import PageTransition from "./animations/PageTransition";
 
+import WebcamImageCapture from "./WebcamProof";
+
 const BorrowItemForm = ({ data }) => {
 	const [openModal, setOpenModal] = useState(false);
 	const [openScanner, setOpenScanner] = useState(false);
@@ -158,13 +160,18 @@ const BorrowItemForm = ({ data }) => {
 
 	const handleOnScanned = (result) => {
 		if (result) {
-			const cleanBarcode = result.replace(/"/g, "");
-			setBarcode(cleanBarcode);
-			setValue("itemBarcode", cleanBarcode);
-			if (itemWithBarcode) {
-				addItem(cleanBarcode);
-			}
-			setOpenScanner(false);
+			setTimeout(() => {
+				const cleanBarcode = result.replace(/"/g, "");
+				setBarcode(cleanBarcode);
+				setValue("itemBarcode", cleanBarcode);
+
+				if (itemWithBarcode) {
+					addItem(cleanBarcode);
+				}
+
+				// Close the scanner modal after scanning
+				setOpenScanner(false);
+			}, 200);
 		}
 	};
 
@@ -327,8 +334,8 @@ const BorrowItemForm = ({ data }) => {
 	];
 
 	const handleKeyPress = (e) => {
-		if (e.key === "Enter") {
-			e.preventDefault(); // Prevents form submission or any auto action
+		if (e.key === "Enter" || e.key === "Tab") {
+			e.preventDefault();
 		}
 	};
 
@@ -644,19 +651,7 @@ const BorrowItemForm = ({ data }) => {
 								</div>
 
 								<div className="mb-2">
-									<div className="mb-1 block">
-										<Label
-											htmlFor="proofImage"
-											value="Proof of Transaction Image"
-										/>
-									</div>
-									<input
-										type="file"
-										id="proofImage"
-										accept="image/*"
-										onChange={(e) => setProofImage(e.target.files[0])}
-										className="border rounded p-2"
-									/>
+									<WebcamImageCapture setProofImage={setProofImage} />
 								</div>
 
 								<div className="flex gap-2 w-full">

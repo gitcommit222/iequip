@@ -20,10 +20,15 @@ import {
 	Badge,
 	TextInput,
 	Select,
+	FileInput,
 } from "flowbite-react";
 import Image from "next/image";
 import { saveBtn, view } from "../../../public";
-import { useDeleteItems, useGetItems } from "../../../hooks/useItem";
+import {
+	useBulkCreateItems,
+	useDeleteItems,
+	useGetItems,
+} from "../../../hooks/useItem";
 import CustomPopover from "../../../components/shared/Popover";
 import AddItemForm from "../../../components/AddItemForm";
 import CustomModal from "../../../components/shared/CustomModal";
@@ -394,6 +399,23 @@ const Items = () => {
 		}
 	};
 
+	const { mutateAsync: bulkCreateItems, isPending: isCreating } =
+		useBulkCreateItems();
+
+	const handleFileUpload = async (e) => {
+		const file = e.target.files[0];
+
+		console.log(file);
+		if (file) {
+			try {
+				await bulkCreateItems(file);
+				toast.success("Items created successfully");
+			} catch (error) {
+				toast.error(error.message);
+			}
+		}
+	};
+
 	return (
 		<section className="space-y-4">
 			<div className="w-full flex items-center justify-between mb-4">
@@ -401,7 +423,74 @@ const Items = () => {
 					title="Items"
 					subtext="Manage and keep track of your items here."
 				/>
-				<AddItemForm className="text-[12px] border border-gray-300 p-3 rounded-md hover:text-green-400" />
+				<div className="flex flex-col sm:flex-row justify-end items-center gap-4 w-full max-w-xl">
+					<label
+						className={`relative flex items-center justify-center w-full sm:w-auto px-6 py-4 bg-white border ${
+							isCreating ? "border-green-300" : "border-gray-300"
+						} rounded-lg shadow-sm cursor-pointer hover:bg-gray-50 transition-colors group`}
+					>
+						<div className="flex flex-col items-center space-y-2">
+							{isCreating ? (
+								<>
+									<svg
+										className="animate-spin h-6 w-6 text-green-500"
+										xmlns="http://www.w3.org/2000/svg"
+										fill="none"
+										viewBox="0 0 24 24"
+									>
+										<circle
+											className="opacity-25"
+											cx="12"
+											cy="12"
+											r="10"
+											stroke="currentColor"
+											strokeWidth="4"
+										></circle>
+										<path
+											className="opacity-75"
+											fill="currentColor"
+											d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+										></path>
+									</svg>
+									<span className="text-sm font-medium text-green-600">
+										Creating items...
+									</span>
+								</>
+							) : (
+								<>
+									<span className="text-sm font-medium text-gray-600 group-hover:text-gray-800">
+										Import Items
+									</span>
+								</>
+							)}
+						</div>
+						<input
+							type="file"
+							accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+							onChange={handleFileUpload}
+							className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+							disabled={isCreating}
+						/>
+					</label>
+
+					<div className="flex items-center w-full sm:w-auto">
+						<button className="flex items-center justify-center gap-2 px-6 py-4 bg-green-50 border border-green-200 rounded-lg shadow-sm hover:bg-green-100 transition-colors text-sm font-medium text-green-600">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								className="h-5 w-5"
+								viewBox="0 0 20 20"
+								fill="currentColor"
+							>
+								<path
+									fillRule="evenodd"
+									d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+									clipRule="evenodd"
+								/>
+							</svg>
+							New Item
+						</button>
+					</div>
+				</div>
 			</div>
 			<PageTransition>
 				<div className="flex gap-4">

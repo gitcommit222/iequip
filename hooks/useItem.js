@@ -42,7 +42,8 @@ export const useItemImage = (imagePath) => {
 	return useQuery({
 		queryKey: ["itemImage", imagePath],
 		queryFn: () => getItemImage(imagePath),
-		enabled: !!imagePath, // Only run the query if imagePath is provided
+		enabled: !!imagePath,
+		staleTime: 1000 * 60 * 60 * 24,
 		retry: false,
 	});
 };
@@ -162,6 +163,35 @@ export const useUpdateItem = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: updateItem,
+		onSuccess: () => {
+			queryClient.invalidateQueries(["items"]);
+		},
+	});
+};
+
+const bulkCreateItems = async (file) => {
+	const formData = new FormData();
+
+	formData.append("file", file);
+	try {
+		const response = await api.post("/items/bulk/create", formData, {
+			headers: {
+				"Content-Type": "multipart/form-data",
+			},
+		});
+		return response.data;
+	} catch (error) {
+		if (error.response && error.response.data && error.response.data.message) {
+			throw new Error(error.response.data.message);
+		}
+		throw new Error("An unexpected error occurred.");
+	}
+};
+
+export const useBulkCreateItems = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: bulkCreateItems,
 		onSuccess: () => {
 			queryClient.invalidateQueries(["items"]);
 		},
