@@ -23,7 +23,7 @@ import Image from "next/image";
 import { getImageUrl } from "../utils/imageUtils";
 import PageTransition from "./animations/PageTransition";
 
-import WebcamImageCapture from "./WebcamProof";
+import WebcamImageCapture from "./WebCamProof";
 
 const BorrowItemForm = ({ data }) => {
 	const [openModal, setOpenModal] = useState(false);
