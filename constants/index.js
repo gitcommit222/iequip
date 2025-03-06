@@ -30,6 +30,11 @@ export const navLinks = [
 		icon: "/icons/group.png",
 	},
 	{
+		label: "Activity Log",
+		url: "/activity-log",
+		icon: "/icons/activity-log.png",
+	},
+	{
 		label: "Guides",
 		url: "/guide",
 		icon: "/icons/info.png",

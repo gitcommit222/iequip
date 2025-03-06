@@ -29,6 +29,6 @@
   ".next/types/**/*.ts",
   "**/*.ts",
   "**/*.tsx"
-, "app/(root)/borrow/loading.jsx", "components/animations/PageTransition.jsx", "components/animations/LoadingScreen.jsx"],
+, "app/(root)/borrow/loading.jsx", "components/animations/PageTransition.jsx", "components/animations/LoadingScreen.jsx", "app/(root)/activity-log/page.jsx"],
 
 "exclude": ["node_modules"] }

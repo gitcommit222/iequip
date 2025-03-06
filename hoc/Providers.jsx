@@ -7,8 +7,6 @@ export default function Providers({ children }) {
 	const [queryClient] = useState(() => new QueryClient());
 
 	return (
-		<QueryClientProvider client={queryClient}>
-			{children} <ReactQueryDevtools initialIsOpen={true} />
-		</QueryClientProvider>
+		<QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
 	);
 }

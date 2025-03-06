@@ -17,7 +17,6 @@ import {
 import toast from "react-hot-toast";
 import { format } from "date-fns";
 import { useState, useMemo } from "react";
-import * as XLSX from "xlsx";
 import { generateAndDownloadReceipt } from "../lib/generateReceipt";
 import PageTransition from "./animations/PageTransition";
 
@@ -73,20 +72,212 @@ const BorrowTable = () => {
 			});
 	}, [transactions, searchTerm, statusFilter, sortOrder]);
 
-	const exportToExcel = () => {
-		const dataToExport = filteredAndSortedTransactions.map((item) => ({
-			"Borrower Name": item.recipient.name,
-			Email: item.recipient.email,
-			"Borrowed Item": item.item?.name || "-",
-			"Date Borrowed": format(new Date(item.start_date), "MM/dd/yy"),
-			Status:
-				item?.item.status === "available" ? "Returned" : item?.item.status,
-		}));
+	const exportToExcel = async () => {
+		const ExcelJS = require("exceljs");
+		const workbook = new ExcelJS.Workbook();
+		const worksheet = workbook.addWorksheet("Borrowed Items", {
+			views: [{ showGridLines: false }],
+		});
 
-		const ws = XLSX.utils.json_to_sheet(dataToExport);
-		const wb = XLSX.utils.book_new();
-		XLSX.utils.book_append_sheet(wb, ws, "Borrowed Items");
-		XLSX.writeFile(wb, "borrowed_items.xlsx");
+		try {
+			// Set column widths
+			worksheet.columns = [
+				{ width: 6 }, // NO.
+				{ width: 30 }, // BORROWER NAME
+				{ width: 35 }, // EMAIL
+				{ width: 30 }, // BORROWED ITEM
+				{ width: 15 }, // DATE BORROWED
+				{ width: 15 }, // STATUS
+			];
+
+			// Add header rows with borders
+			const addHeaderRow = (text, rowIndex) => {
+				const row = worksheet.addRow([text]);
+				worksheet.mergeCells(`A${rowIndex}:F${rowIndex}`);
+				row.height = 20;
+				row.font = { bold: true, size: 11 };
+				row.alignment = { horizontal: "center", vertical: "middle" };
+
+				// Add green border for first row
+				if (rowIndex === 1) {
+					worksheet.getCell(`A${rowIndex}`).border = {
+						top: { style: "medium", color: { argb: "00FF00" } },
+						left: { style: "medium", color: { argb: "00FF00" } },
+						right: { style: "medium", color: { argb: "00FF00" } },
+					};
+				}
+
+				// Add thin borders for other cells
+				["A", "B", "C", "D", "E", "F"].forEach((col) => {
+					const cell = worksheet.getCell(`${col}${rowIndex}`);
+					cell.border = {
+						...cell.border,
+						left: { style: "thin" },
+						right: { style: "thin" },
+						bottom: { style: "thin" },
+					};
+				});
+			};
+
+			// Add headers with the current date
+			const currentDate = format(new Date(), "MMMM dd, yyyy");
+			addHeaderRow(
+				"PROVINCIAL DISASTER RISK REDUCTION AND MANAGEMENT OFFICE",
+				1
+			);
+			addHeaderRow("ADMINISTRATION AND TRAINING DIVISION", 2);
+			addHeaderRow(currentDate, 3);
+			addHeaderRow("PDRRMO Main office", 4);
+			addHeaderRow("( Borrowed Items Report )", 5);
+
+			// Add table headers
+			const headerRow = worksheet.addRow([
+				"NO.",
+				"BORROWER NAME",
+				"EMAIL",
+				"BORROWED ITEM",
+				"DATE BORROWED",
+				"STATUS",
+			]);
+			headerRow.height = 25;
+			headerRow.font = { bold: true, size: 11 };
+			headerRow.alignment = { horizontal: "center", vertical: "middle" };
+
+			// Style header cells
+			headerRow.eachCell((cell) => {
+				cell.border = {
+					top: { style: "thin" },
+					bottom: { style: "thin" },
+					left: { style: "thin" },
+					right: { style: "thin" },
+				};
+			});
+
+			// Add data rows
+			filteredAndSortedTransactions.forEach((item, index) => {
+				const row = worksheet.addRow([
+					index + 1,
+					item.recipient.name,
+					item.recipient.email,
+					item.item?.name || "-",
+					format(new Date(item.start_date), "MM/dd/yy"),
+					item.t_status,
+				]);
+
+				row.height = 20;
+
+				// Style data cells
+				row.eachCell((cell, colNumber) => {
+					cell.border = {
+						top: { style: "thin" },
+						bottom: { style: "thin" },
+						left: { style: "thin" },
+						right: { style: "thin" },
+					};
+
+					// Center align specific columns
+					if (colNumber === 1 || colNumber === 5 || colNumber === 6) {
+						cell.alignment = { horizontal: "center", vertical: "middle" };
+					} else {
+						cell.alignment = { vertical: "middle" };
+					}
+				});
+			});
+
+			// Add empty rows for spacing
+			worksheet.addRow([]);
+			worksheet.addRow([]);
+
+			// Footer section
+			const startRow = worksheet.rowCount + 1;
+			worksheet.addRow([]).height = 20;
+
+			// Add footer labels row with proper grid
+			const labelRow = worksheet.addRow([
+				"",
+				"Prepared by:",
+				"Reviewed by:",
+				"Certified Correct:",
+				"",
+				"",
+			]);
+			labelRow.height = 20;
+			labelRow.font = { size: 11 };
+
+			// Style the label cells
+			["B", "C", "D"].forEach((col) => {
+				const cell = worksheet.getCell(`${col}${labelRow.number}`);
+				cell.border = {
+					top: { style: "thin" },
+					left: { style: "thin" },
+					right: { style: "thin" },
+				};
+				cell.alignment = { horizontal: "left", vertical: "bottom" };
+			});
+
+			// Add names row
+			const namesRow = worksheet.addRow([
+				"",
+				"Romer F. Zulueta",
+				"John Keneth P. Baronggo",
+				"Mario D. Mulingbayan,Jr.",
+				"",
+				"",
+			]);
+			namesRow.height = 20;
+			namesRow.font = { size: 11, underline: true, bold: true };
+
+			// Style the name cells
+			["B", "C", "D"].forEach((col) => {
+				const cell = worksheet.getCell(`${col}${namesRow.number}`);
+				cell.border = {
+					left: { style: "thin" },
+					right: { style: "thin" },
+				};
+				cell.alignment = { horizontal: "center", vertical: "bottom" };
+			});
+
+			// Add titles row
+			const titlesRow = worksheet.addRow([
+				"",
+				"Admin Aide IV",
+				"PGADH-PDRRMO",
+				"PGDH-PDRRMO",
+				"",
+				"",
+			]);
+			titlesRow.height = 20;
+			titlesRow.font = { size: 11 };
+
+			// Style the title cells
+			["B", "C", "D"].forEach((col) => {
+				const cell = worksheet.getCell(`${col}${titlesRow.number}`);
+				cell.border = {
+					left: { style: "thin" },
+					right: { style: "thin" },
+					bottom: { style: "thin" },
+				};
+				cell.alignment = { horizontal: "center", vertical: "top" };
+			});
+
+			// Generate file
+			const buffer = await workbook.xlsx.writeBuffer();
+			const blob = new Blob([buffer], {
+				type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+			});
+			const url = window.URL.createObjectURL(blob);
+			const link = document.createElement("a");
+			link.href = url;
+			link.download = `PDRRMO_Borrowed_Items_${format(
+				new Date(),
+				"MMM-dd-yyyy"
+			)}.xlsx`;
+			link.click();
+			window.URL.revokeObjectURL(url);
+		} catch (error) {
+			console.error("Error generating Excel file:", error);
+			toast.error("Error generating Excel file");
+		}
 	};
 
 	const toggleSortOrder = () => {

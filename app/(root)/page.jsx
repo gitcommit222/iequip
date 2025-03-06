@@ -51,12 +51,23 @@ const Home = () => {
 			}))
 			.sort((a, b) => b.count - a.count);
 
-		// console.log(frequentlyBorrowedItems);
-
 		return frequentlyBorrowedItems;
 	};
 
+	const getLowStockGoods = () => {
+		if (!goodsData?.data) return [];
+
+		return goodsData.data
+			.filter((good) => good.quantity_available < 10)
+			.map((good) => ({
+				itemName: good.item_name,
+				count: good.quantity_available,
+			}))
+			.sort((a, b) => a.count - b.count);
+	};
+
 	const mostBorrowedItems = getMostBorrowedItems();
+	const lowStockGoods = getLowStockGoods();
 
 	return (
 		<section>
@@ -94,7 +105,7 @@ const Home = () => {
 							iconUrl={returnedItem}
 						/>
 					</div>
-					<div className="flex flex-wrap items-center justify-center gap-3">
+					<div className="flex flex-wrap items-stretch justify-center gap-3">
 						<div className="flex-1">
 							<h1 className="font-semibold text-[17px] mb-1">
 								Most Borrowed Items (3+ times)
@@ -102,6 +113,22 @@ const Home = () => {
 							<div className="rounded-lg bg-white h-[500px] p-3 flex items-center justify-center">
 								<Suspense fallback={<div>Loading...</div>}>
 									<BarChart data={mostBorrowedItems} />
+								</Suspense>
+							</div>
+						</div>
+						<div className="flex-1">
+							<h1 className="font-semibold text-[17px] mb-1">
+								Low Stock Supplies (&lt; 10 items)
+							</h1>
+							<div className="rounded-lg bg-white h-[500px] p-3 flex items-center justify-center">
+								<Suspense fallback={<div>Loading...</div>}>
+									<BarChart
+										data={lowStockGoods}
+										title="Low Stock Supplies"
+										label="Available Quantity"
+										barColor="rgba(255, 99, 132, 0.7)"
+										borderColor="rgba(255, 99, 132, 1)"
+									/>
 								</Suspense>
 							</div>
 						</div>

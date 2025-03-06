@@ -19,10 +19,16 @@ ChartJS.register(
 	Legend
 );
 
-const BarChart = ({ data }) => {
+const BarChart = ({
+	data,
+	title = "Most Borrowed Items",
+	label = "Times Borrowed",
+	barColor = "rgba(53, 162, 235, 0.7)",
+	borderColor = "rgba(53, 162, 235, 1)",
+}) => {
 	// Array of pleasant colors for the bars
 	const colors = [
-		"rgba(53, 162, 235, 0.7)", // Blue
+		barColor, // Primary color (customizable)
 		"rgba(255, 99, 132, 0.7)", // Pink
 		"rgba(75, 192, 192, 0.7)", // Teal
 		"rgba(255, 159, 64, 0.7)", // Orange
@@ -40,7 +46,7 @@ const BarChart = ({ data }) => {
 		labels: data.map((item) => item.itemName),
 		datasets: [
 			{
-				label: "Times Borrowed",
+				label: label,
 				data: data.map((item) => item.count),
 				backgroundColor: data.map((_, index) => colors[index % colors.length]),
 				borderColor: data.map(
@@ -69,7 +75,7 @@ const BarChart = ({ data }) => {
 			},
 			title: {
 				display: true,
-				text: "Most Borrowed Items",
+				text: title,
 				padding: {
 					top: 10,
 					bottom: 20,
