@@ -17,7 +17,7 @@ const ActivityLog = () => {
 					Error loading activity logs.
 				</div>
 			)}
-			{activities && <ActivityTable activities={activities} />}
+			{activities?.data && <ActivityTable activities={activities?.data} />}
 		</div>
 	);
 };
