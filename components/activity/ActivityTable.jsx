@@ -11,6 +11,7 @@ const ActivityTable = ({ activities }) => {
 				<thead>
 					<tr className="bg-gray-100">
 						<th className="p-4 text-left border">Action</th>
+						<th className="p-4 text-left border">User</th>
 						<th className="p-4 text-left border">Description</th>
 						<th className="p-4 text-left border">Timestamp</th>
 					</tr>
@@ -19,6 +20,7 @@ const ActivityTable = ({ activities }) => {
 					{activities.map((activity, index) => (
 						<tr key={index} className="border-b hover:bg-gray-50">
 							<td className="p-4 border">{activity.action}</td>
+							<td className="p-4 border">{activity.user}</td>
 							<td className="p-4 border">{activity.description}</td>
 							<td className="p-4 border">
 								{new Date(activity.timestamp).toLocaleString()}
