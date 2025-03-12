@@ -13,6 +13,7 @@ const ActivityTable = ({ activities }) => {
 						<th className="p-4 text-left border">Action</th>
 						<th className="p-4 text-left border">User</th>
 						<th className="p-4 text-left border">Description</th>
+						<th className="p-4 text-left border">Name</th>
 						<th className="p-4 text-left border">Timestamp</th>
 					</tr>
 				</thead>
@@ -23,7 +24,7 @@ const ActivityTable = ({ activities }) => {
 							<td className="p-4 border">{activity.user}</td>
 							<td className="p-4 border">{activity.description}</td>
 							<td className="p-4 border">
-								{new Date(activity.timestamp).toLocaleString()}
+								{new Date(activity.createdAt).toLocaleString()}
 							</td>
 						</tr>
 					))}
